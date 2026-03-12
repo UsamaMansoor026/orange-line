@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="hello_blank_fragment">ہیلو خالی فریگمنٹ</string>
+
+    <string name="canal_view">کینال ویو</string>
+
+    <string name="no_changes">کوئی تبدیلی نہیں</string>
+    <string name="set_off">روانہ ہوں</string>
+
+    <string name="_2_56_pm">2:56 شام</string>
+    <string name="for_25_mins">25 منٹ کے لیے</string>
+
+    <string name="sgd_shw">ایس جی ڈی - ایس ایچ ڈبلیو</string>
+    <string name="qainchi_mor">قینچی موڑ</string>
+
+    <string name="show_more_timings">مزید اوقات دکھائیں +9</string>
+    <string name="leaves_every_40_mins">ہر 40 منٹ بعد روانگی</string>
+
+    <string name="arrive_in_55_mins">55 منٹ میں پہنچیں گے</string>
+
+    <string name="departures">روانگیاں</string>
+    <string name="from_canal_view_station">کینال ویو اسٹیشن سے</string>
+
+    <string name="show_new_departures">نئی روانگیاں دکھائیں</string>
+
+    <string name="scheduled">شیڈول</string>
+    <string name="_3_07_pm">3:07 شام</string>
+
+
+    <string name="settings">سیٹنگز</string>
+    <string name="feedback">رائے دیں</string>
+    <string name="share_app">ایپ شیئر کریں</string>
+    <string name="more_apps">مزید ایپس</string>
+    <string name="rate_us">ریٹنگ دیں</string>
+    <string name="contact_us">ہم سے رابطہ کریں</string>
+    <string name="about_us">ہمارے بارے میں</string>
+    <string name="privacy_policy">رازداری کی پالیسی</string>
+
+    <string name="next">اگلا</string>
+    <string name="home">ہوم</string>
+    <string name="route">روٹ</string>
+    <string name="t_cash">ٹی-کیش</string>
+    <string name="search">تلاش کریں</string>
+
+    <string name="coming_soon">جلد آ رہا ہے…</string>
+    <string name="dark_mode">ڈارک موڈ</string>
+
+    <!-- General -->
+    <string name="where_to">کہاں جانا ہے؟</string>
+    <string name="to">تک</string>
+    <string name="start">شروع کریں</string>
+    <string name="clear">صاف کریں</string>
+    <string name="done">مکمل</string>
+
+    <!-- Route / Navigation -->
+    <string name="heading_towards">%1$s کی طرف جا رہے ہیں</string>
+    <string name="stations_of">%1$d از %2$d اسٹیشن</string>
+    <string name="stations_left">%1$d اسٹیشن باقی ہیں</string>
+    <string name="reached_destination">منزل پر پہنچ گئے</string>
+
+    <!-- Distance & Time -->
+    <string name="min">منٹ</string>
+    <string name="km">کلومیٹر</string>
+    <string name="mi">میل</string>
+
+    <!-- Route Details -->
+    <string name="view_details">تفصیلات دیکھیں</string>
+    <string name="hide_details">تفصیلات چھپائیں</string>
+    <string name="show_stops">اسٹاپ دکھائیں</string>
+    <string name="hide_stops">اسٹاپ چھپائیں</string>
+
+    <!-- Departures -->
+    <string name="from_route">%1$s سے</string>
+    <string name="show_upcoming_departures">آنے والی روانگیاں دکھائیں</string>
+    <string name="show_previous_departures">پچھلی روانگیاں دکھائیں</string>
+    <string name="more_timings">مزید اوقات +%1$d</string>
+    <string name="show_timings">اوقات دکھائیں</string>
+
+    <!-- Navigation Footer -->
+    <string name="min_to_destination">%1$d منٹ میں منزل</string>
+    <string name="english">انگریزی</string>
+    <string name="urdu">اردو</string>
+
+    <string name="language">زبان</string>
+    <string name="distance_unit">فاصلہ کی اکائی</string>
+    <string name="time_format">وقت کا فارمیٹ</string>
+    <string name="_24_hr">24 گھنٹے</string>
+
+    <string name="kilometers">کلومیٹر</string>
+    <string name="miles">میل</string>
+
+    <string name="hour_24">24 گھنٹے</string>
+    <string name="hour_12">12 گھنٹے</string>
+
+    <string name="arrive_in_mins">%1$d منٹ میں پہنچیں گے</string>
+    <string name="for_seconds">%1$d سیکنڈ کے لیے</string>
+    <string name="leaves_every_mins">ہر %1$d منٹ بعد روانگی</string>
+    <string name="see_all_departures">تمام روانگیاں دیکھیں</string>
+
+    <string name="stations">اسٹیشنز :</string>
+    <string name="_26">26</string>
+
+    <string name="distance">فاصلہ :</string>
+    <string name="_27_1_km">27.1 کلومیٹر</string>
+
+    <string name="route_time">سفر کا وقت :</string>
+    <string name="_58_mins">58 منٹ</string>
+
+    <string name="where_from">کہاں سے؟</string>
+
+    <string name="stations_no">اسٹیشن نمبر:</string>
+
+    <string name="ali_town_station">علی ٹاؤن اسٹیشن</string>
+
+    <string name="underground">زیرِ زمین</string>
+
+    <string name="add_to_trip">سفر میں شامل کریں</string>
+
+    <string name="plan">منصوبہ؟</string>
+
+</resources>

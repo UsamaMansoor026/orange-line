@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FFFFFF</color>
+    <color name="white">#1E1E1E</color>
+
+    <!-- darker neutrals -->
+    <color name="contrast">#121212</color>
+    <color name="editText">#292929</color>
+    <color name="light_gray">#2A2A2A</color>
+    <color name="dark_gray">#B0B0B0</color>
+
+    <!-- untouched brand colors -->
+    <color name="app_color">#FC843A</color>
+    <color name="start_color">#2ECC71</color>
+    <color name="end_color">#E74C3C</color>
+    <color name="stop_color">#5493E6</color>
+    <color name="nav_color">#3A67FC</color>
+</resources>

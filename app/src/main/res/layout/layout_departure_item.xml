@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/sgd_shw"
+        android:fontFamily="@font/semi_bold"
+        android:textColor="@color/black"
+        android:textSize="12sp"
+        android:id="@+id/routeName"
+        android:paddingHorizontal="5dp"
+        android:layout_marginTop="5dp"
+        android:paddingVertical="2dp"
+        android:background="@drawable/ic_button_small_bg"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"/>
+
+    <TextView
+        android:id="@+id/startStop"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/qainchi_mor"
+        android:fontFamily="@font/medium"
+        android:textColor="@color/dark_gray"
+        android:textSize="12sp"
+        app:layout_constraintStart_toEndOf="@id/routeName"
+        app:layout_constraintTop_toTopOf="@id/routeName"
+        app:layout_constraintBottom_toBottomOf="@id/routeName"
+        android:layout_marginStart="5dp" />
+
+    <TextView
+        android:id="@+id/scheduled"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:gravity="end"
+        android:text="@string/scheduled"
+        android:fontFamily="@font/semi_bold"
+        android:textColor="@color/black"
+        android:textSize="12sp"
+        app:layout_constraintStart_toStartOf="@id/routeName"
+        app:layout_constraintTop_toBottomOf="@id/routeName"/>
+
+    <ImageView
+        android:id="@+id/dot1"
+        android:layout_width="5dp"
+        android:layout_height="5dp"
+        android:src="@drawable/bg_route_dot"
+        app:tint="@color/dark_gray"
+        android:layout_marginStart="5dp"
+        app:layout_constraintStart_toEndOf="@id/scheduled"
+        app:layout_constraintTop_toTopOf="@id/scheduled"
+        app:layout_constraintBottom_toBottomOf="@id/scheduled"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/_3_07_pm"
+        android:textColor="@color/black"
+        android:fontFamily="@font/regular"
+        android:textSize="14sp"
+        android:layout_marginStart="5dp"
+        app:layout_constraintStart_toEndOf="@id/dot1"
+        app:layout_constraintTop_toTopOf="@id/scheduled"
+        app:layout_constraintBottom_toBottomOf="@id/scheduled"
+        android:id="@+id/timeValue"/>
+
+    <ImageView
+        android:id="@+id/dot"
+        android:layout_width="5dp"
+        android:layout_height="5dp"
+        android:src="@drawable/bg_route_dot"
+        app:tint="@color/dark_gray"
+        android:layout_marginStart="5dp"
+        app:layout_constraintStart_toEndOf="@id/timeValue"
+        app:layout_constraintTop_toTopOf="@id/timeValue"
+        app:layout_constraintBottom_toBottomOf="@id/timeValue"/>
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_passengers"
+        app:layout_constraintTop_toTopOf="@id/scheduled"
+        app:layout_constraintBottom_toBottomOf="@id/scheduled"
+        app:layout_constraintStart_toEndOf="@id/dot"
+        android:layout_marginStart="5dp"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="25dp"
+        android:text="2"
+        android:textSize="22sp"
+        android:id="@+id/timeLeft"
+        android:fontFamily="@font/bold"
+        android:textColor="@color/dark_gray"
+        android:layout_marginEnd="10dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <TextView
+        android:id="@+id/timeLeftUnit"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/min"
+        android:textColor="@color/dark_gray"
+        android:fontFamily="@font/regular"
+        android:textSize="12sp"
+        android:layout_marginStart="5dp"
+        app:layout_constraintBottom_toTopOf="@+id/view"
+        app:layout_constraintTop_toBottomOf="@id/timeLeft"
+        app:layout_constraintStart_toStartOf="@id/timeLeft"
+        app:layout_constraintEnd_toEndOf="@id/timeLeft"/>
+
+    <View
+        android:id="@+id/view"
+        android:layout_width="0dp"
+        android:layout_height="1dp"
+        android:background="@color/light_gray"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/timeLeftUnit"/>
+</androidx.constraintlayout.widget.ConstraintLayout>

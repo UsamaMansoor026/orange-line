@@ -1,0 +1,1039 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.home.HomeFragment">
+
+   <androidx.constraintlayout.widget.ConstraintLayout
+       android:layout_width="match_parent"
+       android:layout_height="match_parent">
+       <androidx.constraintlayout.widget.Guideline
+           android:id="@+id/startGuide"
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:orientation="vertical"
+           app:layout_constraintGuide_percent="0.05" />
+
+       <androidx.constraintlayout.widget.Guideline
+           android:id="@+id/endGuide"
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:orientation="vertical"
+           app:layout_constraintGuide_percent="0.95" />
+
+       <androidx.constraintlayout.widget.Guideline
+           android:id="@+id/topGuide"
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:orientation="horizontal"
+           app:layout_constraintGuide_percent="0.05" />
+
+       <com.google.android.gms.maps.MapView
+           android:id="@+id/mapView"
+           android:layout_width="0dp"
+           android:layout_height="0dp"
+           app:layout_constraintBottom_toBottomOf="parent"
+           app:layout_constraintEnd_toEndOf="parent"
+           app:layout_constraintStart_toStartOf="parent"
+           app:layout_constraintTop_toTopOf="parent" />
+
+       <androidx.constraintlayout.widget.Barrier
+           android:id="@+id/topBarrier"
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           app:barrierDirection="bottom"
+           app:constraint_referenced_ids="clear, topGuide" />
+
+       <ImageView
+           android:translationZ="9dp"
+           android:id="@+id/layers"
+           android:layout_width="40dp"
+           android:layout_height="40dp"
+           app:layout_constraintEnd_toStartOf="@id/endGuide"
+           app:layout_constraintTop_toBottomOf="@id/currentLocation"
+           android:src="@drawable/ic_layer"
+           android:layout_marginTop="10dp"
+           android:background="@drawable/ic_button_bg"
+           android:padding="10dp"
+           android:backgroundTint="@color/white"
+           app:tint="@color/black"/>
+
+       <ImageView
+           android:translationZ="9dp"
+           android:id="@+id/currentLocation"
+           android:layout_width="40dp"
+           android:layout_height="40dp"
+           app:layout_constraintEnd_toStartOf="@id/endGuide"
+           app:layout_constraintTop_toBottomOf="@id/topBarrier"
+           android:src="@drawable/ic_current_location"
+           android:layout_marginTop="10dp"
+           android:background="@drawable/ic_button_bg"
+           android:padding="10dp"
+           android:backgroundTint="@color/white"
+           app:tint="@color/black"/>
+
+       <androidx.constraintlayout.widget.ConstraintLayout
+           android:id="@+id/mapViewType"
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:padding="10dp"
+           android:visibility="gone"
+           android:translationZ="9dp"
+           android:layout_marginTop="10dp"
+           app:layout_constraintEnd_toStartOf="@id/endGuide"
+           app:layout_constraintTop_toBottomOf="@id/layers"
+           android:background="@drawable/ic_button_bg"
+           android:backgroundTint="@color/white">
+
+           <com.google.android.material.card.MaterialCardView
+               android:layout_width="wrap_content"
+               android:layout_height="wrap_content"
+               app:cardBackgroundColor="@color/white"
+               app:cardElevation="0dp"
+               app:cardCornerRadius="8dp"
+               android:id="@+id/defaultView"
+               app:layout_constraintTop_toTopOf="parent"
+               app:layout_constraintEnd_toEndOf="parent"
+               app:layout_constraintStart_toStartOf="parent"
+               app:strokeColor="@color/nav_color"
+               app:strokeWidth="2dp">
+               <ImageView
+                   android:layout_width="40dp"
+                   android:layout_height="40dp"
+                   android:src="@drawable/ic_default"/>
+           </com.google.android.material.card.MaterialCardView>
+
+           <TextView
+               android:layout_width="wrap_content"
+               android:layout_height="wrap_content"
+               app:layout_constraintStart_toStartOf="parent"
+               app:layout_constraintEnd_toEndOf="parent"
+               app:layout_constraintTop_toBottomOf="@id/defaultView"
+               android:text="@string/default_view"
+               android:fontFamily="@font/medium"
+               android:textColor="@color/nav_color"
+               android:textSize="14sp"
+               android:id="@+id/defaultName"/>
+
+           <com.google.android.material.card.MaterialCardView
+               android:layout_width="wrap_content"
+               android:layout_height="wrap_content"
+               app:cardBackgroundColor="@color/white"
+               app:cardElevation="0dp"
+               app:cardCornerRadius="8dp"
+               android:id="@+id/satelliteView"
+               app:layout_constraintTop_toBottomOf="@id/defaultName"
+               app:layout_constraintEnd_toEndOf="parent"
+               app:layout_constraintStart_toStartOf="parent"
+               app:strokeColor="@color/nav_color"
+               android:layout_marginTop="5dp"
+               app:strokeWidth="0dp">
+               <ImageView
+                   android:layout_width="40dp"
+                   android:layout_height="40dp"
+                   android:src="@drawable/ic_satellite"/>
+           </com.google.android.material.card.MaterialCardView>
+
+           <TextView
+               android:layout_width="wrap_content"
+               android:layout_height="wrap_content"
+               app:layout_constraintStart_toStartOf="parent"
+               app:layout_constraintEnd_toEndOf="parent"
+               app:layout_constraintTop_toBottomOf="@id/satelliteView"
+               android:text="@string/satellite_view"
+               android:fontFamily="@font/medium"
+               android:textColor="@color/dark_gray"
+               android:textSize="14sp"
+               android:id="@+id/satelliteName"/>
+
+           <com.google.android.material.card.MaterialCardView
+               android:layout_width="wrap_content"
+               android:layout_height="wrap_content"
+               app:cardBackgroundColor="@color/white"
+               app:cardElevation="0dp"
+               app:cardCornerRadius="8dp"
+               android:id="@+id/terrainView"
+               app:layout_constraintTop_toBottomOf="@id/satelliteName"
+               app:layout_constraintEnd_toEndOf="parent"
+               app:layout_constraintStart_toStartOf="parent"
+               app:strokeColor="@color/nav_color"
+               android:layout_marginTop="5dp"
+               app:strokeWidth="0dp">
+               <ImageView
+                   android:layout_width="40dp"
+                   android:layout_height="40dp"
+                   android:src="@drawable/ic_terrain"/>
+           </com.google.android.material.card.MaterialCardView>
+
+           <TextView
+               android:layout_width="wrap_content"
+               android:layout_height="wrap_content"
+               app:layout_constraintStart_toStartOf="parent"
+               app:layout_constraintEnd_toEndOf="parent"
+               app:layout_constraintTop_toBottomOf="@id/terrainView"
+               android:text="@string/terrain"
+               android:fontFamily="@font/medium"
+               android:textColor="@color/dark_gray"
+               android:textSize="14sp"
+               android:id="@+id/terrainName"/>
+       </androidx.constraintlayout.widget.ConstraintLayout>
+
+       <androidx.constraintlayout.widget.ConstraintLayout
+           android:id="@+id/routeHeader"
+           android:layout_width="0dp"
+           android:layout_height="wrap_content"
+           android:background="@drawable/ic_button_bg"
+           android:backgroundTint="@color/white"
+           android:padding="16dp"
+           android:translationZ="10dp"
+           android:visibility="gone"
+           app:layout_constraintEnd_toStartOf="@id/endGuide"
+           app:layout_constraintStart_toEndOf="@id/startGuide"
+           app:layout_constraintTop_toBottomOf="@id/topGuide">
+
+           <!-- FROM -->
+           <TextView
+               android:id="@+id/fromText"
+               android:layout_width="0dp"
+               android:layout_height="wrap_content"
+               android:drawablePadding="10dp"
+               android:fontFamily="@font/medium"
+               android:gravity="center_vertical"
+               android:text="Canal View"
+               android:textColor="@color/start_color"
+               android:textSize="16sp"
+               app:drawableStartCompat="@drawable/ic_to"
+               app:layout_constraintEnd_toStartOf="@id/btnSwap"
+               app:layout_constraintStart_toStartOf="parent"
+               app:layout_constraintTop_toTopOf="parent" />
+
+           <!-- TO -->
+           <TextView
+               android:id="@+id/toText"
+               android:layout_width="0dp"
+               android:layout_height="wrap_content"
+               android:layout_marginTop="10dp"
+               android:drawablePadding="10dp"
+               android:fontFamily="@font/medium"
+               android:gravity="center_vertical"
+               android:text="Khatam-E-Nabuwat"
+               android:textColor="@color/end_color"
+               android:textSize="16sp"
+               app:drawableStartCompat="@drawable/ic_from"
+               app:layout_constraintEnd_toStartOf="@id/btnSwap"
+               app:layout_constraintStart_toStartOf="parent"
+               app:layout_constraintTop_toBottomOf="@id/fromText" />
+
+           <!-- SWAP -->
+           <ImageView
+               android:id="@+id/btnSwap"
+               android:layout_width="wrap_content"
+               android:layout_height="wrap_content"
+               android:padding="16dp"
+               android:src="@drawable/ic_switch_location"
+               app:layout_constraintBottom_toBottomOf="parent"
+               app:layout_constraintEnd_toEndOf="parent"
+               app:layout_constraintTop_toTopOf="parent" />
+
+       </androidx.constraintlayout.widget.ConstraintLayout>
+
+       <FrameLayout
+           android:id="@+id/mapOverlay"
+           android:layout_width="0dp"
+           android:layout_height="0dp"
+           android:visibility="visible"
+           app:layout_constraintBottom_toBottomOf="@id/mapView"
+           app:layout_constraintEnd_toEndOf="@id/mapView"
+           app:layout_constraintStart_toStartOf="@id/mapView"
+           app:layout_constraintTop_toTopOf="@id/mapView">
+
+           <androidx.constraintlayout.widget.ConstraintLayout
+               android:id="@+id/stopInfoCard"
+               android:layout_width="250dp"
+               android:layout_height="wrap_content"
+               android:background="@drawable/ic_button_bg"
+               android:backgroundTint="@color/white"
+               android:padding="16dp"
+               android:translationZ="10dp"
+               android:visibility="gone"
+               app:layout_constraintBottom_toTopOf="@id/bottomSheet"
+               app:layout_constraintEnd_toEndOf="parent"
+               app:layout_constraintStart_toStartOf="parent">
+
+               <ImageView
+                   android:id="@+id/marker"
+                   android:layout_width="wrap_content"
+                   android:layout_height="wrap_content"
+                   android:src="@drawable/ic_marker_stop"
+                   app:layout_constraintStart_toStartOf="parent"
+                   app:layout_constraintTop_toTopOf="parent" />
+
+               <TextView
+                   android:id="@+id/stopTitle"
+                   android:layout_width="wrap_content"
+                   android:layout_height="wrap_content"
+                   android:layout_marginStart="10dp"
+                   android:fontFamily="@font/semi_bold"
+                   android:textColor="@color/black"
+                   android:textSize="16sp"
+                   app:layout_constraintBottom_toBottomOf="@id/marker"
+                   app:layout_constraintStart_toEndOf="@id/marker"
+                   app:layout_constraintTop_toTopOf="@id/marker" />
+
+               <TextView
+                   android:id="@+id/stopSubTitle"
+                   android:layout_width="0dp"
+                   android:layout_height="wrap_content"
+                   android:layout_marginTop="4dp"
+                   android:fontFamily="@font/medium"
+                   android:textColor="@color/dark_gray"
+                   android:textSize="13sp"
+                   app:layout_constraintEnd_toEndOf="parent"
+                   app:layout_constraintStart_toStartOf="@id/marker"
+                   app:layout_constraintTop_toBottomOf="@id/marker" />
+
+               <TextView
+                   android:id="@+id/stopMeta"
+                   android:layout_width="0dp"
+                   android:layout_height="wrap_content"
+                   android:fontFamily="@font/medium"
+                   android:textColor="@color/dark_gray"
+                   android:textSize="12sp"
+                   app:layout_constraintEnd_toEndOf="parent"
+                   app:layout_constraintStart_toStartOf="@id/marker"
+                   app:layout_constraintTop_toBottomOf="@id/stopSubTitle" />
+
+           </androidx.constraintlayout.widget.ConstraintLayout>
+
+       </FrameLayout>
+
+       <TextView
+           android:id="@+id/clear"
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:layout_marginTop="10dp"
+           android:background="@drawable/ic_button_stroke_bg"
+           android:drawablePadding="5dp"
+           android:fontFamily="@font/medium"
+           android:paddingHorizontal="10dp"
+           android:paddingVertical="5dp"
+           android:text="@string/clear"
+           android:textColor="@color/black"
+           android:translationZ="10dp"
+           android:visibility="gone"
+           app:drawableStartCompat="@drawable/ic_close"
+           app:layout_constraintEnd_toStartOf="@id/endGuide"
+           app:layout_constraintTop_toBottomOf="@id/navigationBar"/>
+
+       <androidx.constraintlayout.widget.ConstraintLayout
+           android:id="@+id/navigationBar"
+           android:layout_width="0dp"
+           android:layout_height="wrap_content"
+           android:background="@drawable/ic_button_bg"
+           android:backgroundTint="@color/white"
+           android:padding="10dp"
+           android:translationZ="10dp"
+           android:visibility="gone"
+           app:layout_constraintEnd_toStartOf="@id/endGuide"
+           app:layout_constraintStart_toEndOf="@id/startGuide"
+           app:layout_constraintTop_toBottomOf="@id/topGuide">
+
+           <TextView
+               android:id="@+id/startLocation"
+               android:layout_width="wrap_content"
+               android:layout_height="wrap_content"
+               android:drawablePadding="10dp"
+               android:fontFamily="@font/semi_bold"
+               android:gravity="center_vertical"
+               android:text="@string/canal_view"
+               android:textColor="@color/start_color"
+               android:textSize="16sp"
+               app:drawableStartCompat="@drawable/ic_location"
+               app:layout_constraintBottom_toBottomOf="parent"
+               app:layout_constraintStart_toStartOf="parent"
+               app:layout_constraintTop_toTopOf="parent" />
+
+           <TextView
+               android:id="@+id/endLocation"
+               android:layout_width="wrap_content"
+               android:layout_height="wrap_content"
+               android:layout_marginStart="10dp"
+               android:drawablePadding="10dp"
+               android:fontFamily="@font/semi_bold"
+               android:gravity="center_vertical"
+               android:text="@string/canal_view"
+               android:textColor="@color/start_color"
+               android:textSize="16sp"
+               app:drawableStartCompat="@drawable/ic_next_arrow"
+               app:layout_constraintBottom_toBottomOf="parent"
+               app:layout_constraintStart_toEndOf="@id/startLocation"
+               app:layout_constraintTop_toTopOf="parent" />
+       </androidx.constraintlayout.widget.ConstraintLayout>
+
+       <androidx.constraintlayout.widget.ConstraintLayout
+           android:id="@+id/footerContainer"
+           android:layout_width="0dp"
+           android:layout_height="wrap_content"
+           android:translationZ="20dp"
+           app:layout_constraintBottom_toBottomOf="parent"
+           app:layout_constraintEnd_toEndOf="parent"
+           app:layout_constraintStart_toStartOf="parent">
+
+           <androidx.constraintlayout.widget.ConstraintLayout
+               android:id="@+id/bottomSheet"
+               android:layout_width="0dp"
+               android:layout_height="wrap_content"
+               android:background="@drawable/ic_bottom_sheet_bg"
+               android:paddingHorizontal="20dp"
+               android:paddingBottom="20dp"
+               android:visibility="gone"
+               app:layout_constraintBottom_toBottomOf="parent"
+               app:layout_constraintEnd_toEndOf="parent"
+               app:layout_constraintStart_toStartOf="parent">
+
+               <ImageView
+                   android:id="@+id/handle"
+                   android:layout_width="120dp"
+                   android:layout_height="5dp"
+                   android:layout_marginTop="5dp"
+                   android:src="@drawable/ic_button_bg"
+                   app:layout_constraintEnd_toEndOf="parent"
+                   app:layout_constraintStart_toStartOf="parent"
+                   app:layout_constraintTop_toTopOf="parent"
+                   app:tint="@color/light_gray" />
+
+               <ImageView
+                   android:id="@+id/routeIcon"
+                   android:layout_width="wrap_content"
+                   android:layout_height="wrap_content"
+                   android:layout_marginTop="20dp"
+                   android:src="@drawable/ic_route_switch"
+                   app:layout_constraintStart_toStartOf="parent"
+                   app:layout_constraintTop_toBottomOf="@id/close" />
+
+               <TextView
+                   android:id="@+id/from"
+                   android:layout_width="wrap_content"
+                   android:layout_height="wrap_content"
+                   android:layout_marginStart="15dp"
+                   android:fontFamily="@font/medium"
+                   android:text="Canal View"
+                   android:textColor="@color/start_color"
+                   android:textSize="16sp"
+                   app:layout_constraintBottom_toBottomOf="@id/routeIcon"
+                   app:layout_constraintStart_toEndOf="@id/routeIcon"
+                   app:layout_constraintTop_toTopOf="@id/routeIcon" />
+
+               <TextView
+                   android:id="@+id/gap"
+                   android:layout_width="wrap_content"
+                   android:layout_height="wrap_content"
+                   android:layout_marginStart="10dp"
+                   android:fontFamily="@font/regular"
+                   android:text="@string/to"
+                   android:textColor="@color/dark_gray"
+                   android:textSize="16sp"
+                   app:layout_constraintBottom_toBottomOf="@id/routeIcon"
+                   app:layout_constraintStart_toEndOf="@id/from"
+                   app:layout_constraintTop_toTopOf="@id/routeIcon" />
+
+               <TextView
+                   android:id="@+id/to"
+                   android:layout_width="wrap_content"
+                   android:layout_height="wrap_content"
+                   android:layout_marginStart="10dp"
+                   android:fontFamily="@font/semi_bold"
+                   android:text="Canal View"
+                   android:textColor="@color/end_color"
+                   android:textSize="16sp"
+                   app:layout_constraintBottom_toBottomOf="@id/routeIcon"
+                   app:layout_constraintStart_toEndOf="@id/gap"
+                   app:layout_constraintTop_toTopOf="@id/routeIcon" />
+
+               <ImageView
+                   android:id="@+id/close"
+                   android:layout_width="wrap_content"
+                   android:layout_height="wrap_content"
+                   android:background="@drawable/bg_route_dot"
+                   android:backgroundTint="@color/light_gray"
+                   android:padding="10dp"
+                   android:layout_marginTop="10dp"
+                   android:src="@drawable/ic_close"
+                   app:layout_constraintEnd_toEndOf="parent"
+                   app:layout_constraintTop_toBottomOf="@id/handle"/>
+
+               <ImageView
+                   android:id="@+id/startTrain"
+                   android:layout_width="wrap_content"
+                   android:layout_height="wrap_content"
+                   android:layout_marginTop="20dp"
+                   android:src="@drawable/ic_train"
+                   app:layout_constraintStart_toStartOf="@id/routeIcon"
+                   app:layout_constraintTop_toBottomOf="@id/routeIcon" />
+
+               <TextView
+                   android:layout_width="0dp"
+                   android:layout_height="wrap_content"
+                   android:maxLines="1"
+                   android:text="- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - "
+                   android:textColor="@color/dark_gray"
+                   app:layout_constraintBottom_toBottomOf="@id/startTrain"
+                   app:layout_constraintEnd_toStartOf="@id/endTrain"
+                   app:layout_constraintStart_toEndOf="@id/startTrain"
+                   app:layout_constraintTop_toTopOf="@id/startTrain" />
+
+               <ImageView
+                   android:id="@+id/endTrain"
+                   android:layout_width="wrap_content"
+                   android:layout_height="wrap_content"
+                   android:layout_marginTop="20dp"
+                   android:src="@drawable/ic_train"
+                   app:layout_constraintEnd_toEndOf="parent"
+                   app:layout_constraintTop_toBottomOf="@id/routeIcon" />
+
+               <FrameLayout
+                   android:id="@+id/routeDotsContainer"
+                   android:layout_width="0dp"
+                   android:layout_height="20dp"
+                   android:layout_marginTop="15dp"
+                   android:background="@drawable/bg_route_bar"
+                   android:paddingStart="12dp"
+                   android:paddingEnd="12dp"
+                   android:translationZ="1dp"
+                   app:layout_constraintEnd_toEndOf="parent"
+                   app:layout_constraintStart_toStartOf="parent"
+                   app:layout_constraintTop_toBottomOf="@id/startTrain">
+
+                   <LinearLayout
+                       android:id="@+id/dotsLayout"
+                       android:layout_width="match_parent"
+                       android:layout_height="match_parent"
+                       android:gravity="center_vertical"
+                       android:orientation="horizontal" />
+
+               </FrameLayout>
+
+               <TextView
+                   android:id="@+id/timeValue"
+                   android:layout_width="wrap_content"
+                   android:layout_height="wrap_content"
+                   android:layout_marginTop="10dp"
+                   android:fontFamily="@font/semi_bold"
+                   android:text="25"
+                   android:textColor="@color/nav_color"
+                   android:textSize="16sp"
+                   app:layout_constraintStart_toStartOf="@id/routeDotsContainer"
+                   app:layout_constraintTop_toBottomOf="@id/routeDotsContainer" />
+
+               <TextView
+                   android:id="@+id/timeUnit"
+                   android:layout_width="wrap_content"
+                   android:layout_height="wrap_content"
+                   android:layout_marginStart="5dp"
+                   android:fontFamily="@font/regular"
+                   android:text="@string/min"
+                   android:textColor="@color/nav_color"
+                   android:textSize="14sp"
+                   app:layout_constraintBottom_toBottomOf="@id/timeValue"
+                   app:layout_constraintStart_toEndOf="@id/timeValue"
+                   app:layout_constraintTop_toTopOf="@id/timeValue" />
+
+               <ImageView
+                   android:id="@+id/dot"
+                   android:layout_width="5dp"
+                   android:layout_height="5dp"
+                   android:layout_marginStart="5dp"
+                   android:src="@drawable/bg_route_dot"
+                   app:layout_constraintBottom_toBottomOf="@id/timeUnit"
+                   app:layout_constraintStart_toEndOf="@id/timeUnit"
+                   app:layout_constraintTop_toTopOf="@id/timeUnit"
+                   app:tint="@color/dark_gray" />
+
+               <TextView
+                   android:id="@+id/distanceValue"
+                   android:layout_width="wrap_content"
+                   android:layout_height="wrap_content"
+                   android:layout_marginStart="5dp"
+                   android:fontFamily="@font/semi_bold"
+                   android:text="23"
+                   android:textColor="@color/dark_gray"
+                   android:textSize="16sp"
+                   app:layout_constraintBottom_toBottomOf="@id/timeValue"
+                   app:layout_constraintStart_toEndOf="@id/dot"
+                   app:layout_constraintTop_toTopOf="@id/timeValue" />
+
+               <TextView
+                   android:id="@+id/distanceUnit"
+                   android:layout_width="wrap_content"
+                   android:layout_height="wrap_content"
+                   android:layout_marginStart="5dp"
+                   android:fontFamily="@font/regular"
+                   android:text="@string/km"
+                   android:textColor="@color/dark_gray"
+                   android:textSize="14sp"
+                   app:layout_constraintBottom_toBottomOf="@id/distanceValue"
+                   app:layout_constraintStart_toEndOf="@id/distanceValue"
+                   app:layout_constraintTop_toTopOf="@id/distanceValue" />
+
+               <TextView
+                   android:id="@+id/viewDetails"
+                   android:layout_width="wrap_content"
+                   android:layout_height="wrap_content"
+                   android:drawablePadding="10dp"
+                   android:fontFamily="@font/medium"
+                   android:paddingHorizontal="10dp"
+                   android:paddingVertical="5dp"
+                   android:text="@string/view_details"
+                   android:textColor="@color/dark_gray"
+                   android:textSize="14sp"
+                   app:drawableEndCompat="@drawable/ic_down"
+                   app:layout_constraintBottom_toBottomOf="@id/distanceValue"
+                   app:layout_constraintEnd_toEndOf="parent"
+                   app:layout_constraintTop_toTopOf="@id/distanceValue" />
+
+               <TextView
+                   android:id="@+id/start"
+                   android:layout_width="wrap_content"
+                   android:layout_height="wrap_content"
+                   android:layout_marginTop="10dp"
+                   android:background="@drawable/bg_route_dot"
+                   android:backgroundTint="@color/nav_color"
+                   android:drawablePadding="10dp"
+                   android:fontFamily="@font/medium"
+                   android:gravity="center_vertical"
+                   android:paddingHorizontal="20dp"
+                   android:paddingVertical="5dp"
+                   android:text="@string/start"
+                   android:textColor="@color/white"
+                   android:textSize="14sp"
+                   app:drawableStartCompat="@drawable/ic_start"
+                   app:layout_constraintStart_toStartOf="@id/timeValue"
+                   app:layout_constraintTop_toBottomOf="@id/timeValue" />
+
+               <androidx.core.widget.NestedScrollView
+                   android:id="@+id/moreDetails"
+                   android:layout_width="0dp"
+                   android:layout_height="400dp"
+                   android:fillViewport="true"
+                   android:overScrollMode="never"
+                   android:visibility="gone"
+                   app:layout_constraintBottom_toBottomOf="parent"
+                   app:layout_constraintEnd_toEndOf="parent"
+                   app:layout_constraintStart_toStartOf="parent"
+                   app:layout_constraintTop_toBottomOf="@id/timeValue">
+
+                   <androidx.constraintlayout.widget.ConstraintLayout
+                       android:layout_width="match_parent"
+                       android:layout_height="wrap_content">
+
+                       <androidx.constraintlayout.widget.ConstraintLayout
+                           android:layout_width="0dp"
+                           android:layout_height="wrap_content"
+                           android:visibility="visible"
+                           app:layout_constraintBottom_toBottomOf="parent"
+                           app:layout_constraintEnd_toEndOf="parent"
+                           app:layout_constraintStart_toStartOf="parent"
+                           app:layout_constraintTop_toTopOf="parent">
+
+                           <TextView
+                               android:id="@+id/setOff"
+                               android:layout_width="0dp"
+                               android:layout_height="wrap_content"
+                               android:layout_marginTop="10dp"
+                               android:background="@drawable/ic_button_stroke_bg"
+                               android:drawablePadding="20dp"
+                               android:fontFamily="@font/semi_bold"
+                               android:paddingHorizontal="20dp"
+                               android:paddingVertical="10dp"
+                               android:text="@string/set_off"
+                               android:textColor="@color/black"
+                               android:textSize="20sp"
+                               app:drawableStartCompat="@drawable/ic_set_off"
+                               app:layout_constraintEnd_toEndOf="parent"
+                               app:layout_constraintStart_toStartOf="parent"
+                               app:layout_constraintTop_toTopOf="parent" />
+
+                           <FrameLayout
+                               android:id="@+id/routeDotsContainerV"
+                               android:layout_width="20dp"
+                               android:layout_height="0dp"
+                               android:layout_marginStart="40dp"
+                               android:layout_marginTop="15dp"
+                               android:background="@drawable/bg_route_bar"
+                               android:paddingStart="12dp"
+                               android:paddingEnd="12dp"
+                               android:minHeight="80dp"
+                               android:translationZ="1dp"
+                               app:layout_constraintBottom_toTopOf="@id/arriveIn"
+                               app:layout_constraintStart_toStartOf="parent"
+                               app:layout_constraintTop_toBottomOf="@id/setOff">
+
+                               <LinearLayout
+                                   android:id="@+id/dotsLayoutV"
+                                   android:layout_width="match_parent"
+                                   android:layout_height="match_parent"
+                                   android:gravity="center_horizontal"
+                                   android:orientation="vertical" />
+
+                           </FrameLayout>
+
+                           <TextView
+                               android:id="@+id/startStop"
+                               android:layout_width="wrap_content"
+                               android:layout_height="wrap_content"
+                               android:layout_marginStart="10dp"
+                               android:fontFamily="@font/bold"
+                               android:text="@string/canal_view"
+                               android:textColor="@color/black"
+                               android:textSize="14sp"
+                               app:layout_constraintStart_toEndOf="@id/routeDotsContainerV"
+                               app:layout_constraintTop_toTopOf="@id/routeDotsContainerV" />
+
+                           <TextView
+                               android:id="@+id/startTime"
+                               android:layout_width="wrap_content"
+                               android:layout_height="wrap_content"
+                               android:fontFamily="@font/regular"
+                               android:text="@string/_2_56_pm"
+                               android:textColor="@color/dark_gray"
+                               android:textSize="12sp"
+                               app:layout_constraintBottom_toBottomOf="@+id/startStop"
+                               app:layout_constraintEnd_toEndOf="parent"
+                               app:layout_constraintTop_toTopOf="@id/startStop" />
+
+                           <TextView
+                               android:id="@+id/durationStay"
+                               android:layout_width="wrap_content"
+                               android:layout_height="wrap_content"
+                               android:fontFamily="@font/medium"
+                               android:text="@string/for_25_mins"
+                               android:textColor="@color/stop_color"
+                               android:textSize="12sp"
+                               app:layout_constraintStart_toStartOf="@id/startStop"
+                               app:layout_constraintTop_toBottomOf="@id/startStop" />
+
+                           <TextView
+                               android:id="@+id/routeName"
+                               android:layout_width="wrap_content"
+                               android:layout_height="wrap_content"
+                               android:layout_marginTop="10dp"
+                               android:background="@drawable/ic_button_small_bg"
+                               android:fontFamily="@font/semi_bold"
+                               android:paddingHorizontal="5dp"
+                               android:paddingVertical="2dp"
+                               android:text="@string/sgd_shw"
+                               android:textColor="@color/black"
+                               android:textSize="12sp"
+                               app:layout_constraintStart_toStartOf="@id/startStop"
+                               app:layout_constraintTop_toBottomOf="@id/durationStay" />
+
+                           <TextView
+                               android:layout_width="wrap_content"
+                               android:layout_height="wrap_content"
+                               android:layout_marginStart="5dp"
+                               android:fontFamily="@font/medium"
+                               android:text="@string/qainchi_mor"
+                               android:textColor="@color/dark_gray"
+                               android:textSize="12sp"
+                               app:layout_constraintBottom_toBottomOf="@id/routeName"
+                               app:layout_constraintStart_toEndOf="@id/routeName"
+                               app:layout_constraintTop_toTopOf="@id/routeName" />
+
+                           <TextView
+                               android:id="@+id/showMore"
+                               android:layout_width="0dp"
+                               android:layout_height="wrap_content"
+                               android:layout_marginStart="5dp"
+                               android:drawablePadding="10dp"
+                               android:fontFamily="@font/medium"
+                               android:gravity="end"
+                               android:text="@string/show_more_timings"
+                               android:textColor="@color/dark_gray"
+                               android:textSize="12sp"
+                               app:drawableEndCompat="@drawable/ic_next"
+                               app:layout_constraintBottom_toBottomOf="@id/routeName"
+                               app:layout_constraintEnd_toEndOf="parent"
+                               app:layout_constraintStart_toEndOf="@id/routeName"
+                               app:layout_constraintTop_toTopOf="@id/routeName" />
+
+                           <TextView
+                               android:id="@+id/leaveTime"
+                               android:layout_width="0dp"
+                               android:layout_height="wrap_content"
+                               android:fontFamily="@font/medium"
+                               android:gravity="end"
+                               android:text="@string/leaves_every_40_mins"
+                               android:textColor="@color/black"
+                               android:textSize="12sp"
+                               app:layout_constraintStart_toStartOf="@id/routeName"
+                               app:layout_constraintTop_toBottomOf="@id/routeName" />
+
+                           <TextView
+                               android:id="@+id/hideShow"
+                               android:layout_width="wrap_content"
+                               android:layout_height="wrap_content"
+                               android:layout_marginTop="10dp"
+                               android:background="@drawable/ic_button_small_bg"
+                               android:backgroundTint="@color/light_gray"
+                               android:drawablePadding="10dp"
+                               android:fontFamily="@font/medium"
+                               android:paddingHorizontal="10dp"
+                               android:paddingVertical="5dp"
+                               android:text="@string/show_stops"
+                               android:textColor="@color/black"
+                               android:textSize="12sp"
+                               app:drawableStartCompat="@drawable/ic_drop_down"
+                               app:layout_constraintStart_toStartOf="@id/routeName"
+                               app:layout_constraintTop_toBottomOf="@id/leaveTime" />
+
+                           <androidx.recyclerview.widget.RecyclerView
+                               android:id="@+id/stopsRecycler"
+                               android:layout_width="0dp"
+                               android:layout_height="0dp"
+                               android:nestedScrollingEnabled="true"
+                               android:overScrollMode="never"
+                               android:visibility="gone"
+                               android:translationZ="2dp"
+                               app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                               app:layout_constraintBottom_toTopOf="@id/endTime"
+                               app:layout_constraintEnd_toEndOf="parent"
+                               app:layout_constraintHeight_min="130dp"
+                               app:layout_constraintHeight_max="260dp"
+                               app:layout_constraintStart_toStartOf="@id/routeDotsContainerV"
+                               app:layout_constraintTop_toBottomOf="@id/hideShow"
+                               tools:itemCount="10"
+                               tools:listitem="@layout/item_route_stop"/>
+
+                           <TextView
+                               android:id="@+id/endStop"
+                               android:layout_width="wrap_content"
+                               android:layout_height="wrap_content"
+                               android:layout_marginStart="10dp"
+                               android:layout_marginTop="10dp"
+                               android:fontFamily="@font/bold"
+                               android:text="@string/canal_view"
+                               android:textColor="@color/black"
+                               android:textSize="14sp"
+                               app:layout_constraintBottom_toBottomOf="@id/routeDotsContainerV"
+                               app:layout_constraintStart_toEndOf="@id/routeDotsContainerV"
+                               app:layout_constraintTop_toBottomOf="@id/stopsRecycler" />
+
+                           <TextView
+                               android:id="@+id/endTime"
+                               android:layout_width="wrap_content"
+                               android:layout_height="wrap_content"
+                               android:fontFamily="@font/regular"
+                               android:text="@string/_2_56_pm"
+                               android:textColor="@color/dark_gray"
+                               android:textSize="12sp"
+                               app:layout_constraintBottom_toBottomOf="@+id/endStop"
+                               app:layout_constraintEnd_toEndOf="parent"
+                               app:layout_constraintTop_toTopOf="@id/endStop" />
+
+                           <TextView
+                               android:id="@+id/arriveIn"
+                               android:layout_width="0dp"
+                               android:layout_height="wrap_content"
+                               android:layout_marginTop="15dp"
+                               android:layout_marginBottom="10dp"
+                               android:background="@drawable/ic_button_stroke_bg"
+                               android:drawablePadding="20dp"
+                               android:fontFamily="@font/semi_bold"
+                               android:paddingHorizontal="20dp"
+                               android:paddingVertical="10dp"
+                               android:text="@string/arrive_in_55_mins"
+                               android:textColor="@color/black"
+                               android:textSize="20sp"
+                               app:drawableStartCompat="@drawable/ic_set_off"
+                               app:layout_constraintBottom_toTopOf="@id/startNavigation"
+                               app:layout_constraintEnd_toEndOf="parent"
+                               app:layout_constraintStart_toStartOf="parent"
+                               app:layout_constraintTop_toBottomOf="@id/routeDotsContainerV" />
+
+                           <TextView
+                               android:id="@+id/startNavigation"
+                               android:layout_width="0dp"
+                               android:layout_height="wrap_content"
+                               android:layout_marginTop="10dp"
+                               android:background="@drawable/bg_route_dot"
+                               android:backgroundTint="@color/nav_color"
+                               android:fontFamily="@font/semi_bold"
+                               android:gravity="center"
+                               android:paddingHorizontal="50dp"
+                               android:paddingVertical="15dp"
+                               android:text="@string/start"
+                               android:textColor="@color/white"
+                               android:textSize="16sp"
+                               app:layout_constraintBottom_toBottomOf="parent"
+                               app:layout_constraintEnd_toEndOf="parent"
+                               app:layout_constraintStart_toStartOf="parent" />
+                       </androidx.constraintlayout.widget.ConstraintLayout>
+                   </androidx.constraintlayout.widget.ConstraintLayout>
+               </androidx.core.widget.NestedScrollView>
+
+           </androidx.constraintlayout.widget.ConstraintLayout>
+
+           <androidx.constraintlayout.widget.ConstraintLayout
+               android:id="@+id/navFooter"
+               android:layout_width="0dp"
+               android:layout_height="wrap_content"
+               android:visibility="gone"
+               app:layout_constraintBottom_toBottomOf="parent"
+               app:layout_constraintEnd_toEndOf="parent"
+               app:layout_constraintStart_toStartOf="parent">
+
+               <ImageView
+                   android:id="@+id/navPrev"
+                   android:layout_width="35dp"
+                   android:layout_height="35dp"
+                   android:layout_marginStart="10dp"
+                   android:background="@drawable/ic_button_stroke_bg"
+                   android:padding="10dp"
+                   android:src="@drawable/ic_back"
+                   app:layout_constraintBottom_toBottomOf="@id/navCard"
+                   app:layout_constraintStart_toStartOf="parent"
+                   app:layout_constraintTop_toTopOf="@id/navCard"
+                   app:tint="@color/app_color" />
+
+               <ImageView
+                   android:id="@+id/navNext"
+                   android:layout_width="35dp"
+                   android:layout_height="35dp"
+                   android:layout_marginEnd="10dp"
+                   android:background="@drawable/ic_button_stroke_bg"
+                   android:padding="10dp"
+                   android:src="@drawable/ic_next"
+                   app:layout_constraintBottom_toBottomOf="@id/navCard"
+                   app:layout_constraintEnd_toEndOf="parent"
+                   app:layout_constraintTop_toTopOf="@id/navCard"
+                   app:tint="@color/app_color" />
+
+               <androidx.constraintlayout.widget.ConstraintLayout
+                   android:id="@+id/navCard"
+                   android:layout_width="0dp"
+                   android:layout_height="wrap_content"
+                   android:layout_marginHorizontal="5dp"
+                   android:background="@drawable/ic_button_bg_stroke"
+                   android:paddingHorizontal="16dp"
+                   android:paddingVertical="14dp"
+                   android:translationZ="10dp"
+                   app:layout_constraintBottom_toTopOf="@id/navDots"
+                   app:layout_constraintEnd_toStartOf="@id/navNext"
+                   app:layout_constraintStart_toEndOf="@id/navPrev"
+                   app:layout_constraintTop_toTopOf="parent">
+
+                   <ImageView
+                       android:id="@+id/navIcon"
+                       android:layout_width="wrap_content"
+                       android:layout_height="wrap_content"
+                       android:src="@drawable/ic_set_off"
+                       app:layout_constraintBottom_toBottomOf="parent"
+                       app:layout_constraintStart_toStartOf="parent"
+                       app:layout_constraintTop_toTopOf="parent" />
+
+                   <TextView
+                       android:id="@+id/navStopTitle"
+                       android:layout_width="0dp"
+                       android:layout_height="wrap_content"
+                       android:layout_marginStart="10dp"
+                       android:layout_marginEnd="5dp"
+                       android:drawablePadding="10dp"
+                       android:ellipsize="end"
+                       android:fontFamily="@font/semi_bold"
+                       android:maxLines="1"
+                       android:text="djksahdjsahdsja"
+                       android:textColor="@color/start_color"
+                       android:textSize="16sp"
+                       app:drawableEndCompat="@drawable/ic_next_arrow"
+                       app:layout_constraintEnd_toStartOf="@id/navEtaBubble"
+                       app:layout_constraintStart_toEndOf="@id/navIcon"
+                       app:layout_constraintTop_toTopOf="parent" />
+
+                   <TextView
+                       android:id="@+id/navNextStop"
+                       android:layout_width="0dp"
+                       android:layout_height="wrap_content"
+                       android:layout_marginEnd="5dp"
+                       android:ellipsize="end"
+                       android:fontFamily="@font/medium"
+                       android:maxLines="1"
+                       android:textColor="@color/dark_gray"
+                       android:textSize="13sp"
+                       app:layout_constraintEnd_toEndOf="@id/navStopTitle"
+                       app:layout_constraintStart_toStartOf="@id/navStopTitle"
+                       app:layout_constraintTop_toBottomOf="@id/navStopTitle" />
+
+                   <TextView
+                       android:id="@+id/navMeta"
+                       android:layout_width="0dp"
+                       android:layout_height="wrap_content"
+                       android:layout_marginEnd="5dp"
+                       android:fontFamily="@font/medium"
+                       android:textColor="@color/dark_gray"
+                       android:textSize="12sp"
+                       app:layout_constraintEnd_toStartOf="@id/navEtaBubble"
+                       app:layout_constraintStart_toStartOf="@id/navNextStop"
+                       app:layout_constraintTop_toBottomOf="@id/navNextStop" />
+
+                   <TextView
+                       android:id="@+id/navEtaBubble"
+                       android:layout_width="44dp"
+                       android:layout_height="44dp"
+                       android:background="@drawable/bg_route_dot"
+                       android:backgroundTint="@color/app_color"
+                       android:fontFamily="@font/semi_bold"
+                       android:gravity="center"
+                       android:lineHeight="12dp"
+                       android:textColor="@color/white"
+                       android:textSize="12sp"
+                       app:layout_constraintBottom_toBottomOf="parent"
+                       app:layout_constraintEnd_toEndOf="parent"
+                       app:layout_constraintTop_toTopOf="@id/navStopTitle" />
+
+               </androidx.constraintlayout.widget.ConstraintLayout>
+
+               <LinearLayout
+                   android:id="@+id/navDots"
+                   android:layout_width="wrap_content"
+                   android:layout_height="wrap_content"
+                   android:layout_marginTop="10dp"
+                   android:layout_marginBottom="20dp"
+                   android:background="@drawable/ic_button_stroke_bg"
+                   android:gravity="center"
+                   android:orientation="horizontal"
+                   android:padding="5dp"
+                   android:translationZ="10dp"
+                   app:layout_constraintBottom_toBottomOf="parent"
+                   app:layout_constraintEnd_toEndOf="parent"
+                   app:layout_constraintStart_toStartOf="parent"
+                   app:layout_constraintTop_toBottomOf="@id/navCard" />
+
+           </androidx.constraintlayout.widget.ConstraintLayout>
+       </androidx.constraintlayout.widget.ConstraintLayout>
+
+   </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <View
+        android:id="@+id/dimOverlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#73000000"
+        android:visibility="gone"
+        android:alpha="100" />
+
+    <FrameLayout
+        android:id="@+id/stopSelectionSheet"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:behavior_hideable="true"
+        app:behavior_peekHeight="0dp"
+        android:translationZ="15dp"
+        app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
+
+        <include
+            android:id="@+id/sheetContent" layout="@layout/fragment_choose_stop" />
+
+    </FrameLayout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.home.HomeFragment">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <!-- Map View - takes most of the space -->
+        <com.google.android.gms.maps.MapView
+            android:id="@+id/mapView"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <!-- Compact Navigation Footer for PiP -->
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/navFooterPip"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:background="@drawable/ic_button_bg"
+            android:backgroundTint="@color/white"
+            android:padding="8dp"
+            android:translationZ="10dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent">
+
+            <!-- Current Stop Title -->
+            <TextView
+                android:id="@+id/navStopTitlePip"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:fontFamily="@font/semi_bold"
+                android:maxLines="1"
+                android:textColor="@color/start_color"
+                android:textSize="10sp"
+                app:layout_constraintEnd_toStartOf="@id/navEtaBubblePip"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintBottom_toTopOf="@id/navNextStopPip"
+                app:layout_constraintTop_toTopOf="@id/navEtaBubblePip" />
+
+            <!-- Next Stop -->
+            <TextView
+                android:id="@+id/navNextStopPip"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:fontFamily="@font/regular"
+                android:maxLines="1"
+                android:textColor="@color/dark_gray"
+                android:textSize="10sp"
+                app:layout_constraintBottom_toBottomOf="@id/navEtaBubblePip"
+                app:layout_constraintEnd_toEndOf="@id/navStopTitlePip"
+                app:layout_constraintStart_toStartOf="@id/navStopTitlePip"
+                app:layout_constraintTop_toBottomOf="@id/navStopTitlePip" />
+
+            <!-- ETA Bubble -->
+            <TextView
+                android:id="@+id/navEtaBubblePip"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:background="@drawable/bg_route_dot"
+                android:backgroundTint="@color/app_color"
+                android:fontFamily="@font/semi_bold"
+                android:gravity="center"
+                android:textColor="@color/white"
+                android:textSize="10sp"
+                android:lineHeight="10dp"
+                app:layout_constraintStart_toEndOf="@id/navStopTitlePip"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
+

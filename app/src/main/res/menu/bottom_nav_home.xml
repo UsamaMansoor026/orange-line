@@ -1,0 +1,28 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/nav_home"
+        android:icon="@drawable/ic_home_selector"
+        android:title="@string/home" />
+
+    <item
+        android:id="@+id/nav_departures"
+        android:icon="@drawable/ic_departures_selector"
+        android:title="@string/departures" />
+
+    <item
+        android:id="@+id/nav_route"
+        android:icon="@drawable/ic_route_selector"
+        android:title="@string/route" />
+
+    <item
+        android:id="@+id/nav_t_cash"
+        android:icon="@drawable/ic_t_cash_selector"
+        android:title="@string/t_cash" />
+
+    <item
+        android:id="@+id/nav_settings"
+        android:icon="@drawable/ic_settings_selector"
+        android:title="@string/settings" />
+
+</menu>
