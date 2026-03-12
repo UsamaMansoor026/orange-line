@@ -271,11 +271,7 @@ class HomeFragment : Fragment() {
                 // camera logic from running for a while.
                 lastCameraUpdateTime = 0L
 
-                val fromLatLng = LatLng(stop.latitude, stop.longitude)
-                Log.d("train", "Moving camera to FROM STOP: $fromLatLng")
-
-                // 3. EXECUTE ANIMATION
-                googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(fromLatLng, 15f))
+                moveCamera()
             }
         }
     }
@@ -823,7 +819,7 @@ class HomeFragment : Fragment() {
                 } else {
                     setupObservers()
                     // Apply camera offset if already navigating
-                    if (appViewModel.navigationMode.value == NavigationMode.NAVIGATING) {
+                    if (appViewModel.navigationMode.value == NavigationMode.NAVIGATING && !isReturningFromPip) {
                         binding.root.post {
                             applyNavCameraOffset()
                         }
@@ -843,39 +839,64 @@ class HomeFragment : Fragment() {
                 stops.forEach { include(LatLng(it.latitude, it.longitude)) }
             }.build()
 
-            val dLon = Math.toRadians(toStop.longitude - fromStop.longitude)
+            // 1. Calculate Padding
+            val topPadding = if (binding.routeHeader.isVisible && binding.routeHeader.height > 0)
+                binding.routeHeader.height + 16.dp else 16.dp
+
+            val bottomPadding = if (binding.bottomSheet.isVisible && binding.bottomSheet.height > 0)
+                binding.bottomSheet.height + 16.dp
+            else
+                sheetBehavior.peekHeight + 16.dp
+
+            // 2. Calculate Bearing to align diagonally
+            // We calculate the angle from FROM to TO
             val lat1 = Math.toRadians(fromStop.latitude)
+            val lon1 = Math.toRadians(fromStop.longitude)
             val lat2 = Math.toRadians(toStop.latitude)
-            val x = sin(dLon) * cos(lat2)
-            val y = cos(lat1) * sin(lat2) - sin(lat1) * cos(lat2) * cos(dLon)
-            val bearing = (Math.toDegrees(atan2(x, y)).toFloat() + 360f) % 360f
+            val lon2 = Math.toRadians(toStop.longitude)
 
-            binding.root.post {
-                if (!isMapReady) return@post
-                googleMap.moveCamera(
-                    CameraUpdateFactory.newCameraPosition(
-                        CameraPosition.Builder()
-                            .target(bounds.center)
-                            .zoom(googleMap.cameraPosition.zoom)
-                            .tilt(0f)
-                            .bearing(0f)
-                            .build()
-                    )
-                )
-                googleMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, 120))
-                val fitZoom = googleMap.cameraPosition.zoom
+            val dLon = lon2 - lon1
+            val y = Math.sin(dLon) * Math.cos(lat2)
+            val x =
+                Math.cos(lat1) * Math.sin(lat2) - Math.sin(lat1) * Math.cos(lat2) * Math.cos(dLon)
+            val trueBearing = (Math.toDegrees(Math.atan2(y, x)).toFloat() + 360f) % 360f
 
-                googleMap.animateCamera(
-                    CameraUpdateFactory.newCameraPosition(
-                        CameraPosition.Builder()
-                            .target(bounds.center)
-                            .zoom(fitZoom)
-                            .tilt(0f)
-                            .bearing(bearing)
-                            .build()
-                    ), 450, null
-                )
+            // Offset by 45 degrees to place TO in top-right and FROM in bottom-left
+            val targetBearing = (trueBearing - 45f + 360f) % 360f
+
+            // 3. Zoom Calculation
+            // Use a slightly larger padding for the diagonal fit to prevent markers hitting edges
+            val padding = 100.dp
+            val cu = CameraUpdateFactory.newLatLngBounds(bounds, padding)
+            googleMap.moveCamera(cu)
+
+            val extraZoom = when {
+                stops.size <= 3 -> 0.2f
+                stops.size <= 6 -> 0.3f
+                stops.size <= 12 -> 0.7f
+                else -> 1.1f
             }
+
+            val fitZoom = googleMap.cameraPosition.zoom + extraZoom
+
+            // 4. Center Adjustment (Vertical Offset for UI overlap)
+            val verticalOffsetPx = (sheetBehavior.peekHeight - topPadding) / 2f
+            val projection = googleMap.projection
+            val centerPoint = projection.toScreenLocation(bounds.center)
+            centerPoint.y += verticalOffsetPx.toInt()
+            val shiftedCenter = projection.fromScreenLocation(centerPoint)
+
+            // 5. Final Animation
+            googleMap.animateCamera(
+                CameraUpdateFactory.newCameraPosition(
+                    CameraPosition.Builder()
+                        .target(shiftedCenter)
+                        .zoom(fitZoom)
+                        .bearing(targetBearing)
+                        .tilt(0f)
+                        .build()
+                ), 600, null
+            )
         }
     }
 
@@ -1021,10 +1042,18 @@ class HomeFragment : Fragment() {
                     stopNavCameraMode()
                     stopCompass()
                     stopLiveLocationUpdates()
-                    resetMapPadding()
 
-//                    binding.root.post {
-//                        resetNavCameraView()
+//                    if (isMapReady) {
+//                        googleMap.moveCamera(
+//                            CameraUpdateFactory.newCameraPosition(
+//                                CameraPosition.Builder()
+//                                    .target(googleMap.cameraPosition.target)
+//                                    .zoom(googleMap.cameraPosition.zoom)
+//                                    .tilt(0f)      // ← kill nav tilt
+//                                    .bearing(0f)   // ← kill nav bearing
+//                                    .build()
+//                            )
+//                        )
 //                    }
 
                     if (routePolyline == null) {
@@ -1040,35 +1069,7 @@ class HomeFragment : Fragment() {
                         routePolyline?.isVisible = true
                     }
 
-                    binding.root.post {
-                        val points = appViewModel.roadRoutePoints.value ?: emptyList()
-                        if (points.size > 1 && isMapReady) {
-                            moveCamera()
-                        } else {
-                            // Fallback: move to FROM stop directly
-                            appViewModel.fromStop.value?.let { from ->
-                                googleMap.animateCamera(
-                                    CameraUpdateFactory.newLatLngZoom(
-                                        LatLng(
-                                            from.latitude,
-                                            from.longitude
-                                        ), 15f
-                                    ),
-                                    350, null
-                                )
-                            }
-                        }
-                    }
-
                     hideStationLabels()
-
-//                    if (allowServiceStop && !shouldRestoreNav) {
-//                        allowServiceStop = false
-//                        Log.d("train","I am Here" )
-//                        Log.d("train", "AllowServiceStop: $allowServiceStop , shouldRestoreNav: $shouldRestoreNav")
-//                        stopNavForegroundService()
-////                        setupSelectionCameraObserver()
-//                    }
 
 //                    This piece of code kill the service when we are in NORMAl layout or transition from pip to NORMAL layout
                     if (allowServiceStop) {
@@ -1096,17 +1097,22 @@ class HomeFragment : Fragment() {
                     binding.sheetContent.root.isVisible = false
                     sheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
 
-//                    val points = appViewModel.roadRoutePoints.value ?: emptyList()
-//                    if (points.size > 1) {
-//                        drawRoadRoute(points, false)   // full route + bounds fit
-//                    }
-//
-//                    // ✅ redraw stop markers if needed
-//                    appViewModel.selectedRoute.value?.let {
-//                        drawStopMarkers(it.stops)
-//                        populateRouteUI(it)
-//                    }
-
+                    binding.root.post {
+                        binding.root.post {  // ← double post ensures layout is measured
+                            val points = appViewModel.roadRoutePoints.value ?: emptyList()
+                            if (points.size > 1 && isMapReady) {
+                                moveCamera()
+                            } else {
+                                appViewModel.fromStop.value?.let { from ->
+                                    googleMap.animateCamera(
+                                        CameraUpdateFactory.newLatLngZoom(
+                                            LatLng(from.latitude, from.longitude), 15f
+                                        ), 350, null
+                                    )
+                                }
+                            }
+                        }
+                    }
                 }
 
                 NavigationMode.NAVIGATING -> {
@@ -1766,10 +1772,12 @@ class HomeFragment : Fragment() {
         }
 
         binding.start.addPressEffect {
+            resetMapPadding()
             appViewModel.startNavigation()
         }
 
         binding.startNavigation.addPressEffect {
+            resetMapPadding()
             appViewModel.startNavigation()
         }
 
@@ -2551,7 +2559,7 @@ class HomeFragment : Fragment() {
                     appViewModel.userLocation.value!!.latitude,
                     appViewModel.userLocation.value!!.longitude
                 )
-            ).zoom(17.8f)  // Adjust zoom level as needed
+            ).zoom(17f)  // Adjust zoom level as needed
                 .tilt(65f)  // Maintain a tilt for better navigation visibility
                 .bearing(lastBearing)  // Keep the bearing based on the user's orientation
                 .build()

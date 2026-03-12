@@ -354,7 +354,7 @@ class AppViewModel @Inject constructor(
 
         userLocation.observeForever { loc ->
             if (loc != null && !cities.value.isNullOrEmpty()) {
-                resolveCityFromLocation()
+//                resolveCityFromLocation()
             }
         }
         routes.observeForever {
