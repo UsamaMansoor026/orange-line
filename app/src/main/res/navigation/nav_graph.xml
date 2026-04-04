@@ -7,37 +7,37 @@
 
     <fragment
         android:id="@+id/homeFragment"
-        android:name="com.webscare.orangeline.ui.home.HomeFragment"
+        android:name="com.webscare.orangelinelahore.ui.home.HomeFragment"
         android:label="fragment_home"
         tools:layout="@layout/fragment_home" />
     <fragment
         android:id="@+id/splashFragment"
-        android:name="com.webscare.orangeline.ui.splash.SplashFragment"
+        android:name="com.webscare.orangelinelahore.ui.splash.SplashFragment"
         android:label="fragment_splash"
         tools:layout="@layout/fragment_splash" />
     <fragment
         android:id="@+id/onboardingFragment"
-        android:name="com.webscare.orangeline.ui.onboarding.OnboardingFragment"
+        android:name="com.webscare.orangelinelahore.ui.onboarding.OnboardingFragment"
         android:label="fragment_onboarding"
         tools:layout="@layout/fragment_onboarding" />
     <fragment
         android:id="@+id/settingsFragment"
-        android:name="com.webscare.orangeline.ui.settings.SettingsFragment"
+        android:name="com.webscare.orangelinelahore.ui.settings.SettingsFragment"
         android:label="fragment_settings"
         tools:layout="@layout/fragment_settings" />
     <fragment
         android:id="@+id/tCashFragment"
-        android:name="com.webscare.orangeline.ui.TCashFragment"
+        android:name="com.webscare.orangelinelahore.ui.TCashFragment"
         android:label="fragment_t_cash"
         tools:layout="@layout/fragment_t_cash" />
     <fragment
         android:id="@+id/departuresFragment"
-        android:name="com.webscare.orangeline.ui.departure.DeparturesFragment"
+        android:name="com.webscare.orangelinelahore.ui.departure.DeparturesFragment"
         android:label="fragment_departures"
         tools:layout="@layout/fragment_departures" />
     <fragment
         android:id="@+id/routeFragment"
-        android:name="com.webscare.orangeline.ui.route.RouteFragment"
+        android:name="com.webscare.orangelinelahore.ui.route.RouteFragment"
         android:label="fragment_route"
         tools:layout="@layout/fragment_route" />
 </navigation>

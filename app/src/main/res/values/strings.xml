@@ -105,4 +105,6 @@
     <string name="lahore_metro_train">Lahore Metro Train</string>
     <string name="destination_reached">Destination reached 🎉</string>
     <string name="you_have_arrived_your_destination">You have arrived your destination</string>
+
+    <string name="copyright">© 2026 WebsCare Pvt. Ltd. All rights reserved.</string>
 </resources>

@@ -8,23 +8,44 @@ plugins {
 }
 
 android {
-    namespace = "com.webscare.orangeline"
+    namespace = "com.webscare.orangelinelahore"
     compileSdk = 36
 
+    signingConfigs {
+        create("release") {
+            storeFile = file("C:\\Users\\zubai\\Downloads\\TrainMap\\app\\upload-keystore-orangelinelahore.jks")
+            storePassword = project.findProperty("KEYSTORE_PASSWORD") as String
+            keyPassword = project.findProperty("KEY_PASSWORD") as String
+            keyAlias = project.findProperty("KEY_ALIAS") as String
+        }
+    }
+
     defaultConfig {
-        applicationId = "com.webscare.orangeline"
+        applicationId = "com.webscare.orangelinelahore"
         minSdk = 24
         targetSdk = 36
         versionCode = 1
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        setProperty("archivesBaseName", "Orange Line - V$versionCode($versionName)")
+        setProperty("archivesBaseName", "Orange Line Lahore - V$versionCode($versionName)")
     }
 
     buildTypes {
-        release {
+        getByName("release") {
+            isMinifyEnabled = true
+            isShrinkResources = true
+            signingConfig = signingConfigs.getByName("release")
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
+        }
+
+        debug {
             isMinifyEnabled = false
+            isShrinkResources = false
+            isDebuggable = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
