@@ -8,7 +8,7 @@ plugins {
 }
 
 android {
-    namespace = "com.webscare.orangelinelahore"
+    namespace = "com.webscare.orangelinetrain"
     compileSdk = 36
 
     signingConfigs {
@@ -21,7 +21,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.webscare.orangelinelahore"
+        applicationId = "com.webscare.orangelinetrain"
         minSdk = 24
         targetSdk = 36
         versionCode = 1
