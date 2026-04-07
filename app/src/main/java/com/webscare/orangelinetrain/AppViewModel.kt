@@ -2,6 +2,7 @@ package com.webscare.orangelinetrain
 
 import android.content.Context
 import android.location.Location
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
@@ -175,7 +176,7 @@ class AppViewModel @Inject constructor(
     private fun findNearestIndex(
         route: List<LatLng>,
         target: LatLng,
-        maxDistanceMeters: Float = 80f
+        maxDistanceMeters: Float = 200f
     ): Int {
 
         var minDistance = Float.MAX_VALUE
@@ -274,7 +275,8 @@ class AppViewModel @Inject constructor(
 
     fun loadAllRouteTracks() {
 
-        val allRoutes = routes.value ?: return
+        val allRoutes = routes.value
+        if (allRoutes == null) return
 
         viewModelScope.launch {
 

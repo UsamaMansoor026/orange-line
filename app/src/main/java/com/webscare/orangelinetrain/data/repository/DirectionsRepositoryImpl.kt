@@ -12,24 +12,33 @@ class DirectionsRepositoryImpl @Inject constructor(
     @ApplicationContext private val appContext: Context,
 ) : DirectionsRepository {
 
+    // Cache so we only parse the JSON once
+    private var cachedTrack: List<LatLng>? = null
+
     override suspend fun loadRoute(): List<LatLng> {
+        cachedTrack?.let { return it }  // return cached if available
 
-        val json = appContext.assets
-            .open("route_track.json")   // your new file name
-            .bufferedReader()
-            .use { it.readText() }
+        return try {
+            val json = appContext.assets
+                .open("route_track.json")
+                .bufferedReader()
+                .use { it.readText() }
 
-        val geoRoute = Gson().fromJson(json, GeoJsonRoute::class.java)
+            val geoRoute = Gson().fromJson(json, GeoJsonRoute::class.java)
 
-        val coordinates = geoRoute
-            .features
-            .first()
-            .geometry
-            .coordinates
+            val coordinates = geoRoute
+                .features
+                .first()
+                .geometry
+                .coordinates
 
-        return coordinates.map { coord ->
-            LatLng(coord[1], coord[0])
+            val track = coordinates.map { coord -> LatLng(coord[1], coord[0]) }
+            cachedTrack = track  // save it
+            track
+
+        } catch (e: Exception) {
+            android.util.Log.e("DirectionsRepo", "Failed to load route: ${e.message}", e)
+            emptyList()  // never crash, always return safely
         }
     }
 }
-

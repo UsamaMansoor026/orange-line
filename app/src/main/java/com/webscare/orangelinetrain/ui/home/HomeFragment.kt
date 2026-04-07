@@ -1215,6 +1215,7 @@ class HomeFragment : Fragment() {
 
 //        Here camera is moving to the routes
         appViewModel.allRouteTracks.observe(viewLifecycleOwner) { map ->
+            if (map.isNullOrEmpty()) return@observe  // ADD THIS guard
             drawAllRoutesTracks(map)
             if (!wasNavigating) {
                 resetNavCameraView()
