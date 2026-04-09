@@ -107,6 +107,11 @@ class AppViewModel @Inject constructor(
     fun setPipMode(enabled: Boolean) {
         isInPipMode.postValue(enabled)
     }
+    val fullRouteStops: LiveData<List<Stop>> = routes.map { routeList ->
+        if (routeList.isNullOrEmpty()) return@map emptyList()
+        // Orange Line is one route — take the first route's full stop list
+        routeList.first().stops
+    }
 
     // --- Persist navigation state ---
     private fun persistNavState() {
@@ -385,11 +390,11 @@ class AppViewModel @Inject constructor(
     val routeStopsForTimeline: LiveData<List<Stop>> =
         activeRoute.map { route -> route?.stops ?: emptyList() }
 
-    val routeMeta: LiveData<RouteMeta?> = activeRoute.map { route ->
-        if (route == null) null
-        else RouteMeta(
-            start = route.start ?: route.stops.firstOrNull()?.name.orEmpty(),
-            end = route.end ?: route.stops.lastOrNull()?.name.orEmpty(),
+    val routeMeta: LiveData<RouteMeta?> = routes.map { routeList ->
+        val route = routeList?.firstOrNull() ?: return@map null
+        RouteMeta(
+            start = route.stops.firstOrNull()?.name.orEmpty(),
+            end = route.stops.lastOrNull()?.name.orEmpty(),
             stopCount = route.stops.size,
             distance = route.ride_distance.toDouble(),
             duration = route.total_ride_time

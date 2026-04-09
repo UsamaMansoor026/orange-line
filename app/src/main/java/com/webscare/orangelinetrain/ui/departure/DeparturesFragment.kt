@@ -16,6 +16,8 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
@@ -49,6 +51,7 @@ import com.webscare.orangelinetrain.domain.model.Route
 import com.webscare.orangelinetrain.domain.model.Stop
 import com.webscare.orangelinetrain.ui.home.DeparturesBottomSheet
 import com.webscare.orangelinetrain.ui.home.StopsAdapter
+import com.webscare.orangelinetrain.ui.route.ChooseStopBottomSheetFragment
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -97,6 +100,23 @@ class DeparturesFragment : Fragment() {
         appViewModel.sheetSource.value = SheetSource.DEPARTURES
         setupBottomSheet()
         setupMap(savedInstanceState)
+
+        ViewCompat.setOnApplyWindowInsetsListener(binding.sheetContent.recyclerView) { view, insets ->
+
+            val imeInsets = insets.getInsets(WindowInsetsCompat.Type.ime())
+            val systemInsets = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+
+            val bottomPadding = maxOf(imeInsets.bottom, systemInsets.bottom)
+
+            view.setPadding(
+                view.paddingLeft,
+                view.paddingTop,
+                view.paddingRight,
+                bottomPadding
+            )
+
+            insets
+        }
     }
 
     private fun setupBottomSheet() {
@@ -409,11 +429,25 @@ class DeparturesFragment : Fragment() {
         )
     }
 
+    private fun openChooseStopSheetForEdit(mode: SelectionMode) {
+        appViewModel.selectionMode.value = mode
+        val sheet = ChooseStopBottomSheetFragment()
+        sheet.show(parentFragmentManager, "ChooseStopBottomSheet")
+    }
+
     private fun setupClicks() {
 
         googleMap.setOnMapClickListener { }
         googleMap.setOnMarkerClickListener { true }
         googleMap.setOnCameraMoveListener { }
+
+        binding.fromText.addPressEffect {
+            openChooseStopSheetForEdit(SelectionMode.FROM)
+        }
+
+        binding.toText.addPressEffect {
+            openChooseStopSheetForEdit(SelectionMode.TO)
+        }
 
         binding.defaultView.addPressEffect { saveAndApply("default") }
         binding.satelliteView.addPressEffect { saveAndApply("satellite") }
@@ -634,11 +668,17 @@ class DeparturesFragment : Fragment() {
                 val route = appViewModel.selectedRoute.value ?: return@observe
 
                 populateRouteHeader(route)
-                openDeparturesSheet()
+                closeChooseStopSheet()
             } else {
                 hideRouteHeader()
             }
         }
+    }
+
+    private fun closeChooseStopSheet() {
+        val sheet = parentFragmentManager.findFragmentByTag("ChooseStopBottomSheet")
+                as? ChooseStopBottomSheetFragment
+        sheet?.dismiss()
     }
 
     private fun openDeparturesSheet() {

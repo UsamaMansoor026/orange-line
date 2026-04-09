@@ -50,7 +50,7 @@ class RouteFragment : Fragment() {
 
     private fun observeRoute() {
 
-        appViewModel.routeStopsForTimeline.observe(viewLifecycleOwner) { stops ->
+        appViewModel.fullRouteStops.observe(viewLifecycleOwner) { stops ->
             if (stops.isEmpty()) return@observe
             adapter.submitList(stops)
         }

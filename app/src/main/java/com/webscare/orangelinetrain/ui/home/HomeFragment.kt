@@ -32,6 +32,8 @@ import androidx.core.graphics.ColorUtils
 import androidx.core.graphics.createBitmap
 import androidx.core.graphics.scale
 import androidx.core.graphics.toColorInt
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
@@ -281,6 +283,23 @@ class HomeFragment : Fragment() {
             setupPipLayout(savedInstanceState)
         } else {
             setupNormalLayout(savedInstanceState)
+        }
+
+        ViewCompat.setOnApplyWindowInsetsListener(binding.sheetContent.recyclerView) { view, insets ->
+
+            val imeInsets = insets.getInsets(WindowInsetsCompat.Type.ime())
+            val systemInsets = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+
+            val bottomPadding = maxOf(imeInsets.bottom, systemInsets.bottom)
+
+            view.setPadding(
+                view.paddingLeft,
+                view.paddingTop,
+                view.paddingRight,
+                bottomPadding
+            )
+
+            insets
         }
     }
 
@@ -1350,13 +1369,74 @@ class HomeFragment : Fragment() {
 
     }
 
+    private fun timeBetweenStopsMinutes(route: Route, fromIndex: Int, toIndex: Int): Int {
+        val stops = route.stops
+        val start = fromIndex.coerceIn(0, stops.lastIndex)
+        val end = toIndex.coerceIn(0, stops.lastIndex)
+
+        if (start >= end) return 0
+
+        // Distance between selected stops only
+        var segmentMeters = 0.0
+        for (i in start until end) {
+            segmentMeters += distanceMeters(
+                stops[i].latitude, stops[i].longitude,
+                stops[i + 1].latitude, stops[i + 1].longitude
+            )
+        }
+
+        // Full route distance from API (e.g. 27.10 km)
+        val totalKm = route.ride_distance
+            .replace("km", "", ignoreCase = true)
+            .trim()
+            .toDoubleOrNull() ?: return 0
+
+        val totalMeters = totalKm * 1000.0
+        if (totalMeters == 0.0) return 0
+
+        // Proportional time
+        // e.g. segment is 1km out of 27km total, total time is 45min
+        // so time = (1/27) * 45 = ~1.6 min
+        val ratio = segmentMeters / totalMeters
+        val minutes = (route.total_ride_time * ratio).roundToInt()
+
+        Log.d("TIME_DEBUG", "segmentMeters=$segmentMeters totalMeters=$totalMeters ratio=$ratio minutes=$minutes")
+
+        return minutes.coerceAtLeast(1)
+    }
+
     @RequiresApi(Build.VERSION_CODES.O)
     private fun populateRouteUI(route: Route) {
-
         appViewModel.setNavStopIndex(0)
 
         setupStopsList(route.stops)
 
+        // ---- CALCULATE FROM/TO SPECIFIC VALUES ----
+        val fromStop = appViewModel.fromStop.value
+        val toStop = appViewModel.toStop.value
+
+        val fromIndex = route.stops.indexOfFirst { it.id == fromStop?.id }.takeIf { it != -1 } ?: 0
+        val toIndex = route.stops.indexOfFirst { it.id == toStop?.id }.takeIf { it != -1 } ?: route.stops.lastIndex
+
+        Log.d("TIME_DEBUG", "ride_distance from API = ${route.ride_distance}")
+        Log.d("TIME_DEBUG", "total stops in route = ${route.stops.size}")
+        Log.d("TIME_DEBUG", "stop names = ${route.stops.map { it.name }}")
+
+        val adjustedMinutes = timeBetweenStopsMinutes(route, fromIndex, toIndex)
+
+        // Calculate adjusted distance between selected stops
+        var adjustedMeters = 0.0
+        for (i in fromIndex until toIndex) {
+            adjustedMeters += distanceMeters(
+                route.stops[i].latitude, route.stops[i].longitude,
+                route.stops[i + 1].latitude, route.stops[i + 1].longitude
+            )
+        }
+        val adjustedKm = adjustedMeters / 1000.0
+
+        Log.d("TIME_DEBUG", "adjustedMinutes=$adjustedMinutes adjustedKm=$adjustedKm")
+
+        // ---- BUS TIMES ----
         val nextBus = getNextBusTime(
             route.first_ride_time, route.last_ride_time, route.leave_bus
         )
@@ -1364,7 +1444,8 @@ class HomeFragment : Fragment() {
         if (nextBus != null) {
             binding.startTime.text = formatTime(nextBus)
 
-            val endTime = nextBus.plusMinutes(route.total_ride_time.toLong())
+            // Use adjusted time for end time calculation
+            val endTime = nextBus.plusMinutes(adjustedMinutes.toLong())
             binding.endTime.text = formatTime(endTime)
 
             val remaining = getRemainingBuses(
@@ -1379,46 +1460,39 @@ class HomeFragment : Fragment() {
             cachedBusTimes = remaining
         }
 
-        // ---- BASIC INFO ----
-        binding.arriveIn.text = getString(
-            R.string.arrive_in_mins, route.total_ride_time
-        )
+        // ---- BASIC INFO ---- (now using adjusted values)
+        binding.arriveIn.text = getString(R.string.arrive_in_mins, adjustedMinutes)
 
-// durationStay = fixed 30 seconds
-        binding.durationStay.text = getString(
-            R.string.for_seconds, 30
-        )
+        binding.durationStay.text = getString(R.string.for_seconds, 30)
 
-// leaveTime = leave_bus (minutes interval)
-        binding.leaveTime.text = getString(
-            R.string.leaves_every_mins, route.leave_bus
-        )
-        binding.from.text = route.start
-        binding.to.text = route.end
+        binding.leaveTime.text = getString(R.string.leaves_every_mins, route.leave_bus)
 
-        binding.timeValue.text = route.total_ride_time.toString()
-        val km = route.ride_distance.replace("km", "", true).trim().toDoubleOrNull() ?: 0.0
+        binding.from.text = fromStop?.name ?: route.start
+        binding.to.text = toStop?.name ?: route.end
 
-        val (value, unit) = formatDistance(km)
+        // Use adjusted time and distance
+        binding.timeValue.text = adjustedMinutes.toString()
 
+        val (value, unit) = formatDistance(adjustedKm)
         binding.distanceValue.text = value
         binding.distanceUnit.text = unit
 
         binding.routeName.text = route.name
 
-        // ---- DOTS (number of stops) ----
-        renderHorizontalDots(route.stops.size)
-        renderVerticalDots(route.stops)
+        // ---- DOTS (only stops between from and to) ----
+        val selectedStops = route.stops.subList(fromIndex, toIndex + 1)
+        renderHorizontalDots(selectedStops.size)
+        renderVerticalDots(selectedStops)
 
         // ---- START / END ----
-        binding.startStop.text = route.start
-        binding.endStop.text = route.end
+        binding.startStop.text = fromStop?.name ?: route.start
+        binding.endStop.text = toStop?.name ?: route.end
 
         // ---- SHOW SHEET ----
         binding.bottomSheet.visibility = View.VISIBLE
 
-        binding.startLocation.text = route.start
-        binding.endLocation.text = route.end
+        binding.startLocation.text = fromStop?.name ?: route.start
+        binding.endLocation.text = toStop?.name ?: route.end
     }
 
     private fun renderHorizontalDots(count: Int) {
@@ -2852,7 +2926,6 @@ class HomeFragment : Fragment() {
             return
         }
 
-
         val allStops = appViewModel.selectedRoute.value?.stops
             ?: allStops.takeIf { it.isNotEmpty() }
 
@@ -2866,16 +2939,16 @@ class HomeFragment : Fragment() {
         mapView.post {
             if (!isMapReady) return@post
             googleMap.setPadding(
-                0,
-                0,
-                (mapView.width * 0.25f).toInt(),
-                (mapView.height * 0.20f).toInt()
+                (mapView.width * 0.30f).toInt(),
+                (mapView.height * 0.05f).toInt(),
+                (mapView.width * 0.05f).toInt(),
+                (mapView.height * 0.85f).toInt()
             )
             googleMap.animateCamera(
                 CameraUpdateFactory.newCameraPosition(
                     CameraPosition.Builder()
                         .target(bounds.center)
-                        .zoom(11.5f)
+                        .zoom(12.5f)
                         .tilt(0f)
                         .bearing(55f)
                         .build()

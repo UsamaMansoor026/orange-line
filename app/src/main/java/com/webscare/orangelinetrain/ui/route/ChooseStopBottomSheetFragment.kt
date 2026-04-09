@@ -2,6 +2,7 @@ package com.webscare.orangelinetrain.ui.route
 
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -13,6 +14,7 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.activityViewModels
+import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.snackbar.Snackbar
 import com.webscare.orangelinetrain.AppViewModel
@@ -44,6 +46,23 @@ class ChooseStopBottomSheetFragment : BottomSheetDialogFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        ViewCompat.setOnApplyWindowInsetsListener(binding.recyclerView) { view, insets ->
+
+            val imeInsets = insets.getInsets(WindowInsetsCompat.Type.ime())
+            val systemInsets = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+
+            val bottomPadding = maxOf(imeInsets.bottom, systemInsets.bottom)
+
+            view.setPadding(
+                view.paddingLeft,
+                view.paddingTop,
+                view.paddingRight,
+                bottomPadding
+            )
+
+            insets
+        }
 
         setupRecycler()
         setupObservers()
@@ -232,6 +251,9 @@ class ChooseStopBottomSheetFragment : BottomSheetDialogFragment() {
 
         dialog?.window?.apply {
             setDimAmount(0.45f)
+            setSoftInputMode(
+                WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE
+            )
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
                 setDecorFitsSystemWindows(false)
             }
@@ -249,10 +271,6 @@ class ChooseStopBottomSheetFragment : BottomSheetDialogFragment() {
             dialog?.findViewById<View>(
                 com.google.android.material.R.id.design_bottom_sheet
             ) ?: return
-
-        ViewCompat.setOnApplyWindowInsetsListener(bottomSheet) { _, _ ->
-            WindowInsetsCompat.CONSUMED
-        }
 
         bottomSheet.layoutParams.height = ViewGroup.LayoutParams.MATCH_PARENT
         bottomSheet.setPadding(0, 0, 0, 0)
