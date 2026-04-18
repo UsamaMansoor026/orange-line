@@ -164,6 +164,9 @@ class HomeFragment : Fragment() {
     private val CAMERA_UPDATE_INTERVAL_MS = 140L
     private val CAMERA_BEARING_THRESHOLD = 10f   // jitter control
     private val CAMERA_TARGET_THRESHOLD_METERS = 1.5 // ignore micro target moves
+    private var isManualBrowsing = false
+    private var manualBrowseTime = 0L
+    private val MANUAL_BROWSE_HOLD_MS = 3000L
 
     private val navLocationReceiver = object : android.content.BroadcastReceiver() {
         override fun onReceive(context: android.content.Context?, intent: Intent?) {
@@ -995,7 +998,7 @@ class HomeFragment : Fragment() {
                 drawUpcomingRouteOnly(full, loc)
             }
             updateReachedStopLogic(route, loc)
-            updateNavFooter(route, loc)
+//            updateNavFooter(route, loc)
             checkDestinationArrival(route, loc)
             checkIfDestinationReached(route, loc)
         }
@@ -1932,11 +1935,16 @@ class HomeFragment : Fragment() {
         }
 
         binding.navPrev.addPressEffect {
-            val idx = (appViewModel.navStopIndex.value ?: 0) - 1
+            isManualBrowsing = true
+            manualBrowseTime = android.os.SystemClock.elapsedRealtime()
+            val idx = reachedStopIndex - 1
             appViewModel.setNavStopIndex(idx)
         }
+
         binding.navNext.addPressEffect {
-            val idx = (appViewModel.navStopIndex.value ?: 0) + 1
+            isManualBrowsing = true
+            manualBrowseTime = android.os.SystemClock.elapsedRealtime()
+            val idx = reachedStopIndex + 1
             appViewModel.setNavStopIndex(idx)
         }
         setupNavFooterSwipe()
@@ -2001,12 +2009,16 @@ class HomeFragment : Fragment() {
                     if (abs(dx) > threshold && dy < threshold) {
 
                         if (dx < 0) {
+                            isManualBrowsing = true
+                            manualBrowseTime = android.os.SystemClock.elapsedRealtime()
                             appViewModel.setNavStopIndex(
-                                (appViewModel.navStopIndex.value ?: 0) + 1
+                                reachedStopIndex + 1
                             )
                         } else {
+                            isManualBrowsing = true
+                            manualBrowseTime = android.os.SystemClock.elapsedRealtime()
                             appViewModel.setNavStopIndex(
-                                (appViewModel.navStopIndex.value ?: 0) - 1
+                                reachedStopIndex - 1
                             )
                         }
                         return@setOnTouchListener true
@@ -2554,6 +2566,17 @@ class HomeFragment : Fragment() {
             !isMapReady ||
             appViewModel.navigationMode.value != NavigationMode.NAVIGATING
         ) return
+
+        if (isManualBrowsing) {
+            val elapsed = android.os.SystemClock.elapsedRealtime() - manualBrowseTime
+            if (elapsed < MANUAL_BROWSE_HOLD_MS) return  // still holding, do nothing
+            // 3 seconds passed — reset footer and release camera
+            isManualBrowsing = false
+            reachedStopIndex = 0
+            appViewModel.selectedRoute.value?.let { route ->
+                updateNavFooter(route, loc)
+            }
+        }
 
         val now = android.os.SystemClock.elapsedRealtime()
         if (now - lastCameraUpdateTime < CAMERA_UPDATE_INTERVAL_MS) return
