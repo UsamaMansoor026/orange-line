@@ -969,9 +969,13 @@ class HomeFragment : Fragment() {
         }
 
         appViewModel.navStopIndex.observe(viewLifecycleOwner) { index ->
+            // 1. Sync the local variable so updateNavFooter knows which stop to render
+            reachedStopIndex = index
+
             currentNavIndex = index
             if (appViewModel.navigationMode.value == NavigationMode.NAVIGATING) {
                 appViewModel.selectedRoute.value?.let { route ->
+                    // 2. This will now use the updated reachedStopIndex
                     updateNavFooter(route, appViewModel.userLocation.value)
                     focusStopOnMap(route, index)
                 }
@@ -2017,7 +2021,6 @@ class HomeFragment : Fragment() {
     }
 
     private fun updateNavFooter(route: Route, loc: Location?) {
-
         val currentIdx = reachedStopIndex.coerceIn(0, route.stops.lastIndex)
         val nextIdx = (currentIdx + 1).coerceAtMost(route.stops.lastIndex)
 
