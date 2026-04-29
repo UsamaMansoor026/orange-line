@@ -15,14 +15,23 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent">
-        <ImageView
-            android:id="@+id/drawableSplash"
+        <FrameLayout
+            android:id="@+id/logoClipContainer"
             android:layout_width="250dp"
             android:layout_height="250dp"
-            android:src="@drawable/ic_splash"
+            android:clipChildren="true"
+            android:clipToPadding="true"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"/>
+            app:layout_constraintTop_toTopOf="parent">
+
+            <ImageView
+                android:id="@+id/drawableSplash"
+                android:layout_width="250dp"
+                android:layout_height="250dp"
+                android:src="@drawable/ic_splash"/>
+
+        </FrameLayout>
 
         <TextView
             android:id="@+id/title"
@@ -33,9 +42,9 @@
             android:textSize="40sp"
             android:textColor="@color/black"
             android:letterSpacing="0.05"
-            app:layout_constraintStart_toStartOf="@id/drawableSplash"
-            app:layout_constraintEnd_toEndOf="@id/drawableSplash"
-            app:layout_constraintTop_toBottomOf="@id/drawableSplash"/>
+            app:layout_constraintStart_toStartOf="@id/logoClipContainer"
+            app:layout_constraintEnd_toEndOf="@id/logoClipContainer"
+            app:layout_constraintTop_toBottomOf="@id/logoClipContainer"/>
 
         <TextView
             android:id="@+id/subTitle"
@@ -46,8 +55,8 @@
             android:textSize="18sp"
             android:letterSpacing="0.4"
             android:textColor="@color/dark_gray"
-            app:layout_constraintStart_toStartOf="@id/drawableSplash"
-            app:layout_constraintEnd_toEndOf="@id/drawableSplash"
+            app:layout_constraintStart_toStartOf="@id/logoClipContainer"
+            app:layout_constraintEnd_toEndOf="@id/logoClipContainer"
             app:layout_constraintTop_toBottomOf="@id/title"/>
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

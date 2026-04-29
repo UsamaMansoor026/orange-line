@@ -992,7 +992,7 @@
                         android:backgroundTint="@color/app_color"
                         android:fontFamily="@font/semi_bold"
                         android:gravity="center"
-                        android:lineHeight="12dp"
+                        android:lineHeight="16dp"
                         android:textColor="@color/white"
                         android:textSize="12sp"
                         app:layout_constraintBottom_toBottomOf="parent"

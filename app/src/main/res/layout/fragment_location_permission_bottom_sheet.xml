@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:id="@+id/locationPermissionBottomSheet"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg_location_sheet"
+    android:paddingHorizontal="20dp"
+    android:paddingBottom="20dp"
+    android:clipToPadding="false"
+    >
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideStart"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.05" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideEnd"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.95" />
+
+    <!-- Top 2% -->
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideTop"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.03" />
+
+    <!-- Bottom 2% -->
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideBottom"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.97" />
+
+    <ImageView
+        android:id="@+id/close_btn_sheet"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_close"
+        app:layout_constraintEnd_toEndOf="@id/guideEnd"
+        app:layout_constraintTop_toTopOf="@id/guideTop"
+        android:background="@drawable/ic_close_bg"
+        android:padding="8dp"
+        />
+
+    <ImageView
+        android:id="@+id/img_location"
+        android:layout_width="wrap_content"
+        android:layout_height="150dp"
+        android:scaleX="1.5"
+        android:scaleY="1.5"
+        android:src="@drawable/ic_location_image"
+        android:layout_marginTop="40dp"
+        app:layout_constraintEnd_toEndOf="@id/guideEnd"
+        app:layout_constraintStart_toStartOf="@id/guideStart"
+        app:layout_constraintTop_toBottomOf="@id/close_btn_sheet" />
+
+    <TextView
+        android:id="@+id/titlebottomsheet"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/semi_bold"
+        android:gravity="center"
+        android:text="@string/location_heading"
+        android:textColor="@color/dark_gray"
+        android:textSize="24sp"
+        app:layout_constraintEnd_toEndOf="@id/guideEnd"
+        app:layout_constraintStart_toStartOf="@id/guideStart"
+        app:layout_constraintTop_toBottomOf="@id/img_location" />
+
+    <TextView
+        android:id="@+id/descbottomsheet"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/medium"
+        android:includeFontPadding="false"
+        android:text="@string/location_text"
+        android:textColor="@color/dark_gray"
+        android:textSize="12sp"
+        android:layout_marginTop="10dp"
+        app:layout_constraintEnd_toEndOf="@id/titlebottomsheet"
+        app:layout_constraintStart_toStartOf="@id/titlebottomsheet"
+        app:layout_constraintTop_toBottomOf="@id/titlebottomsheet" />
+
+
+    <TextView
+        android:id="@+id/btn_enable"
+        android:layout_width="0dp"
+        android:layout_height="50dp"
+        android:layout_marginBottom="8dp"
+        android:background="@drawable/bg_primary_btn"
+        android:elevation="0dp"
+        android:fontFamily="@font/medium"
+        android:gravity="center"
+        android:layout_marginTop="20dp"
+        android:text="@string/location_enable"
+        android:textColor="@color/white"
+        android:textSize="16sp"
+        app:layout_constraintTop_toBottomOf="@id/descbottomsheet"
+        app:layout_constraintEnd_toEndOf="@id/guideEnd"
+        app:layout_constraintStart_toStartOf="@id/guideStart" />
+
+    <TextView
+        android:id="@+id/btn_notNow"
+        android:layout_width="0dp"
+        android:layout_height="50dp"
+        android:layout_marginBottom="8dp"
+        android:elevation="0dp"
+        android:fontFamily="@font/medium"
+        android:gravity="center"
+        android:text="@string/location_notnow"
+        android:textColor="@color/dark_gray"
+        android:textSize="14sp"
+        app:layout_constraintTop_toBottomOf="@id/btn_enable"
+        app:layout_constraintEnd_toEndOf="@id/guideEnd"
+        app:layout_constraintStart_toStartOf="@id/guideStart" />
+
+    <ImageView
+        android:id="@+id/ic_info"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_info"
+        app:tint="@color/dark_gray"
+        app:layout_constraintStart_toStartOf="@id/guideStart"
+        app:layout_constraintTop_toTopOf="@id/disclaimer"
+        app:layout_constraintBottom_toBottomOf="@id/disclaimer"
+        />
+
+    <TextView
+        android:id="@+id/disclaimer"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="@string/disclaimer"
+        app:layout_constraintStart_toEndOf="@id/ic_info"
+        app:layout_constraintEnd_toEndOf="@id/guideEnd"
+        app:layout_constraintTop_toBottomOf="@id/btn_notNow"
+        android:fontFamily="@font/regular"
+        android:includeFontPadding="false"
+        android:textSize="11sp"
+        android:lineHeight="12dp"
+        android:layout_marginStart="6dp"
+        android:layout_marginTop="8dp"
+        android:textColor="@color/dark_gray"
+        />
+</androidx.constraintlayout.widget.ConstraintLayout>

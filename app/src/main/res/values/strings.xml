@@ -107,4 +107,12 @@
     <string name="you_have_arrived_your_destination">You have arrived your destination</string>
 
     <string name="copyright">© 2026 WebsCare Pvt. Ltd. All rights reserved.</string>
+
+    <string name="location_heading">Location Access</string>
+    <string name="location_text">This app collects location data to enable real-time train tracking, station-to-station navigation, and arrival alerts even when the app is closed or not in use. Your location is used to track your journey progress, calculate nearby stations, and notify you when you are approaching or have reached your selected destination. \n
+Location data is not stored or shared with any third parties and is used only to provide navigation features.</string>
+    <string name="location_enable">Allow Location Access</string>
+    <string name="location_notnow"><u>Not Now</u></string>
+
+    <string name="disclaimer">Location data is not stored or shared with third parties, used only for app features.</string>
 </resources>

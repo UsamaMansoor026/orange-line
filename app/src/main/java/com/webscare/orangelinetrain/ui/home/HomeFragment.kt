@@ -2,6 +2,7 @@ package com.webscare.orangelinetrain.ui.home
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.hardware.Sensor
@@ -26,6 +27,7 @@ import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
+import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.ColorUtils
@@ -75,6 +77,8 @@ import com.webscare.orangelinetrain.databinding.FragmentHomePipBinding
 import com.webscare.orangelinetrain.domain.model.Departure
 import com.webscare.orangelinetrain.domain.model.Route
 import com.webscare.orangelinetrain.domain.model.Stop
+import com.webscare.orangelinetrain.ui.location.LocationPermissionBottomSheetFragment
+import com.webscare.orangelinetrain.ui.location.LocationPermissionHandler
 import com.webscare.orangelinetrain.ui.route.ChooseStopBottomSheetFragment
 import com.webscare.orangelinetrain.ui.route.DestinationReachedBottomSheet
 import dagger.hilt.android.AndroidEntryPoint
@@ -134,7 +138,7 @@ class HomeFragment : Fragment() {
     private var isNavUpdatesRunning = false
     private val appViewModel: AppViewModel by activityViewModels()
     private var minutesPerMeter = 0.0
-    private lateinit var locationPermissionLauncher: ActivityResultLauncher<String>
+//    private lateinit var locationPermissionLauncher: ActivityResultLauncher<String>
     private var currentNavIndex: Int = 0
     private var isExpanded = false
     private var startY = 0f
@@ -168,8 +172,16 @@ class HomeFragment : Fragment() {
     private var manualBrowseTime = 0L
     private val MANUAL_BROWSE_HOLD_MS = 3000L
 
+    companion object {
+        private var permissionSheetShownThisSession = false
+    }
+
+    private val permissionHandler = LocationPermissionHandler(this) {
+        enableLocation()
+    }
+
     private val navLocationReceiver = object : android.content.BroadcastReceiver() {
-        override fun onReceive(context: android.content.Context?, intent: Intent?) {
+        override fun onReceive(context: Context?, intent: Intent?) {
             when (intent?.action) {
                 NavigationLocationService.ACTION_LOCATION -> {
                     val lat = intent.getDoubleExtra(
@@ -205,11 +217,11 @@ class HomeFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        locationPermissionLauncher =
-            registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
-                if (granted) enableLocation()
-                else locationPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
-            }
+//        locationPermissionLauncher =
+//            registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
+//                if (granted) enableLocation()
+//                else locationPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+//            }
         notificationPermissionLauncher =
             registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
                 if (granted) {
@@ -304,6 +316,26 @@ class HomeFragment : Fragment() {
 
             insets
         }
+
+        if (!isUsingPipLayout) {
+            val granted = ActivityCompat.checkSelfPermission(
+                requireContext(), Manifest.permission.ACCESS_FINE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED
+
+            val alreadyShowing = childFragmentManager
+                .findFragmentByTag("LocationPermissionBottomSheet") != null
+
+            if (!granted && !alreadyShowing && !permissionSheetShownThisSession) {
+                permissionSheetShownThisSession = true
+                showPermissionBottomSheet()
+            }
+        }
+    }
+
+    private fun showPermissionBottomSheet() {
+        LocationPermissionBottomSheetFragment().apply {
+            onAccessLocation = { permissionHandler.requestPermission() }
+        }.show(childFragmentManager, "LocationPermissionBottomSheet")
     }
 
     private fun setupNormalLayout(savedInstanceState: Bundle?) {
@@ -814,7 +846,7 @@ class HomeFragment : Fragment() {
             googleMap.isBuildingsEnabled = false
             googleMap.isIndoorEnabled = false
             googleMap.isTrafficEnabled = false
-            checkLocationPermission()
+//            checkLocationPermission()
 
             googleMap.setOnMapLoadedCallback {
                 if (!isUsingPipLayout) {
@@ -998,7 +1030,7 @@ class HomeFragment : Fragment() {
                 drawUpcomingRouteOnly(full, loc)
             }
             updateReachedStopLogic(route, loc)
-//            updateNavFooter(route, loc)
+            updateNavFooter(route, loc)
             checkDestinationArrival(route, loc)
             checkIfDestinationReached(route, loc)
         }
@@ -1352,10 +1384,36 @@ class HomeFragment : Fragment() {
     private fun showStopBubble(marker: Marker, stop: Stop) {
         val route = appViewModel.selectedRoute.value ?: return
         val index = route.stops.indexOfFirst { it.id == stop.id }
+
+        val fromStop = appViewModel.fromStop.value
+        val fromIndex = route.stops.indexOfFirst { it.id == fromStop?.id }.takeIf { it != -1 } ?: 0
+
         binding.stopTitle.text = stop.name
         binding.stopSubTitle.text = getString(R.string.heading_towards, route.end)
 
-        binding.stopMeta.text = "${index + 1} of ${route.stops.size} stations • 2.1 km • 4–5 mins"
+        // Distance: from user's current station to this stop
+        var segmentMeters = 0.0
+        for (i in fromIndex until index) {
+            segmentMeters += distanceMeters(
+                route.stops[i].latitude, route.stops[i].longitude,
+                route.stops[i + 1].latitude, route.stops[i + 1].longitude
+            )
+        }
+        val segmentKm = segmentMeters / 1000.0
+        val (distValue, distUnit) = formatDistance(segmentKm)
+
+        // Time: from start station to this stop
+        val minutes = timeBetweenStopsMinutes(route, fromIndex, index)
+        val timeText = if (minutes >= 60) {
+            val hrs = minutes / 60
+            val mins = minutes % 60
+            if (mins == 0) "${hrs}hr" else "${hrs}hr ${mins}min"
+        } else {
+            "${minutes} min"
+        }
+
+        binding.stopMeta.text = "${index + 1} of ${route.stops.size} stations • $distValue $distUnit • $timeText"
+
         positionBubble(marker.position)
         binding.stopInfoCard.apply {
             alpha = 0f
@@ -1757,11 +1815,22 @@ class HomeFragment : Fragment() {
 
         binding.sheetContent.stopName.setOnFocusChangeListener { _, hasFocus ->
             if (ignoreFocusChanges) return@setOnFocusChangeListener
-            if (hasFocus && sheetBehavior.state == BottomSheetBehavior.STATE_COLLAPSED) {
-                appViewModel.openChooseStop.value = true
-                appViewModel.sheetSource.value = SheetSource.HOME
-                sheetBehavior.state = BottomSheetBehavior.STATE_HALF_EXPANDED
-                binding.sheetContent.recyclerView.isVisible = true
+            if (!hasFocus) return@setOnFocusChangeListener
+
+            val granted = ActivityCompat.checkSelfPermission(
+                requireContext(), Manifest.permission.ACCESS_FINE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED
+
+            if (granted) {
+                if (sheetBehavior.state == BottomSheetBehavior.STATE_COLLAPSED) {
+                    appViewModel.openChooseStop.value = true
+                    appViewModel.sheetSource.value = SheetSource.HOME
+                    sheetBehavior.state = BottomSheetBehavior.STATE_HALF_EXPANDED
+                    binding.sheetContent.recyclerView.isVisible = true
+                }
+            } else {
+                binding.sheetContent.stopName.clearFocus()
+                permissionHandler.requestPermission()
             }
         }
 
@@ -1819,11 +1888,19 @@ class HomeFragment : Fragment() {
         }
 
         binding.sheetContent.stopName.setOnDrawableEndClick {
-            appViewModel.openChooseStop.value = true
-            appViewModel.sheetSource.value = SheetSource.HOME
-            binding.sheetContent.recyclerView.isVisible = true
-            sheetBehavior.state = BottomSheetBehavior.STATE_HALF_EXPANDED
-            appViewModel.selectNearestStop()
+            val granted = ActivityCompat.checkSelfPermission(
+                requireContext(), Manifest.permission.ACCESS_FINE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED
+
+            if (granted) {
+                appViewModel.openChooseStop.value = true
+                appViewModel.sheetSource.value = SheetSource.HOME
+                binding.sheetContent.recyclerView.isVisible = true
+                sheetBehavior.state = BottomSheetBehavior.STATE_HALF_EXPANDED
+                appViewModel.selectNearestStop()
+            } else {
+                permissionHandler.requestPermission()
+            }
         }
 
         binding.currentLocation.addPressEffect {
@@ -2045,21 +2122,31 @@ class HomeFragment : Fragment() {
         val stationsLeft = route.stops.lastIndex - currentIdx
 
         val nextStopMin = timeToNextStopMinutes(route, currentIdx, loc)
-        val destinationMin = timeToDestinationMinutes(route, currentIdx, loc)
+//        val destinationMin = timeToDestinationMinutes(route, currentIdx, loc)
 
         val kmLeft = routeDistanceLeftKm(route, currentIdx, loc)
         val (distValue, distUnit) = formatDistance(kmLeft)
 
         binding.navMeta.text = getString(
             R.string.stations_left, stationsLeft
-        ) + " • $distValue $distUnit • " + getString(R.string.min_to_destination, destinationMin)
+        ) + " • $distValue $distUnit "
 
-        binding.navEtaBubble.text = if (isDestinationReached) "Done" else "${nextStopMin}\nmin"
+        binding.navEtaBubble.text = if (isDestinationReached) "Done" else formatEtaMinutes(nextStopMin)
 
         renderNavDots(route.stops.size, currentIdx)
 
         binding.navPrev.alpha = if (currentIdx <= 0) 0.35f else 1f
         binding.navNext.alpha = if (currentIdx >= route.stops.lastIndex) 0.35f else 1f
+    }
+
+    private fun formatEtaMinutes(minutes: Int): String {
+        return if (minutes >= 60) {
+            val hrs = minutes / 60
+            val mins = minutes % 60
+            if (mins == 0) "${hrs}hr\n" else "${hrs}hr\n${mins}min"
+        } else {
+            "${minutes}\nmin"
+        }
     }
 
     private fun initRouteSpeed(route: Route) {
@@ -2142,7 +2229,7 @@ class HomeFragment : Fragment() {
         val (value, unit) = formatDistance(kmLeft)
 
         binding.stopMeta.text =
-            "${index + 1} of ${route.stops.size} stations • $value $unit • 4–5 mins"
+            "${index + 1} out of ${route.stops.size} stations • $value $unit • 4–5 mins"
 
         binding.stopInfoCard.apply {
             alpha = 0f
@@ -2268,14 +2355,16 @@ class HomeFragment : Fragment() {
     }
 
     private fun checkLocationPermission() {
-        if (ContextCompat.checkSelfPermission(
-                requireContext(), Manifest.permission.ACCESS_FINE_LOCATION
-            ) == PackageManager.PERMISSION_GRANTED
-        ) {
-            enableLocation()
-        } else {
-            locationPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
-        }
+//        if (ContextCompat.checkSelfPermission(
+//                requireContext(), Manifest.permission.ACCESS_FINE_LOCATION
+//            ) == PackageManager.PERMISSION_GRANTED
+//        ) {
+//            enableLocation()
+//        } else {
+//            locationPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+//        }
+    permissionHandler.requestPermission()
+
     }
 
     @SuppressLint("MissingPermission")

@@ -15,6 +15,7 @@ import android.widget.TextView
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
+import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -51,6 +52,7 @@ import com.webscare.orangelinetrain.domain.model.Route
 import com.webscare.orangelinetrain.domain.model.Stop
 import com.webscare.orangelinetrain.ui.home.DeparturesBottomSheet
 import com.webscare.orangelinetrain.ui.home.StopsAdapter
+import com.webscare.orangelinetrain.ui.location.LocationPermissionHandler
 import com.webscare.orangelinetrain.ui.route.ChooseStopBottomSheetFragment
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -65,7 +67,7 @@ class DeparturesFragment : Fragment() {
     private val binding get() = _binding!!
     private lateinit var googleMap: GoogleMap
     private lateinit var locationClient: FusedLocationProviderClient
-    private lateinit var locationPermissionLauncher: ActivityResultLauncher<String>
+//    private lateinit var locationPermissionLauncher: ActivityResultLauncher<String>
     private var routePolyline: Polyline? = null
     private val routeMarkers = mutableListOf<Marker>()
     private var isMapReady = false
@@ -74,6 +76,7 @@ class DeparturesFragment : Fragment() {
     private lateinit var stopsAdapter: StopsAdapter
     private var allStops: List<Stop> = emptyList()
     private var ignoreFocusChanges = false
+    private lateinit var permissionHandler: LocationPermissionHandler
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -84,11 +87,14 @@ class DeparturesFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        locationPermissionLauncher =
-            registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
-                if (granted) enableLocation()
-                else locationPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
-            }
+//        locationPermissionLauncher =
+//            registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
+//                if (granted) enableLocation()
+//                else locationPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+//            }
+        permissionHandler = LocationPermissionHandler(this) {
+            enableLocation()
+        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -211,7 +217,7 @@ class DeparturesFragment : Fragment() {
 
     private fun clearSheetFocus() {
 
-        ignoreFocusChanges = true   // 🔥 START IGNORE
+        ignoreFocusChanges = true   // START IGNORE
 
         binding.sheetContent.stopName.clearFocus()
         binding.sheetContent.fromText.clearFocus()
@@ -310,16 +316,16 @@ class DeparturesFragment : Fragment() {
         ).setAnchorView(binding.sheetContent.recyclerView).show()
     }
 
-    private fun checkLocationPermission() {
-        if (ContextCompat.checkSelfPermission(
-                requireContext(), Manifest.permission.ACCESS_FINE_LOCATION
-            ) == PackageManager.PERMISSION_GRANTED
-        ) {
-            enableLocation()
-        } else {
-            locationPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
-        }
-    }
+//    private fun checkLocationPermission() {
+//        if (ContextCompat.checkSelfPermission(
+//                requireContext(), Manifest.permission.ACCESS_FINE_LOCATION
+//            ) == PackageManager.PERMISSION_GRANTED
+//        ) {
+//            enableLocation()
+//        } else {
+//            locationPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+//        }
+//    }
 
     private fun drawStaticRoute(points: List<LatLng>) {
 
@@ -400,7 +406,7 @@ class DeparturesFragment : Fragment() {
             googleMap.isIndoorEnabled = false
             googleMap.isBuildingsEnabled = false
 
-            checkLocationPermission()
+//            checkLocationPermission()
             setupClicks()
             setupObservers()
             if (appViewModel.selectedRoute.value != null) {
@@ -499,21 +505,38 @@ class DeparturesFragment : Fragment() {
         }
 
         binding.sheetContent.stopName.setOnDrawableEndClick {
-            appViewModel.openChooseStop.value = true
-            appViewModel.sheetSource.value = SheetSource.HOME
-            binding.sheetContent.recyclerView.isVisible = true
-            sheetBehavior.state = BottomSheetBehavior.STATE_HALF_EXPANDED
-            appViewModel.selectNearestStop()
+            val granted = ActivityCompat.checkSelfPermission(
+                requireContext(), Manifest.permission.ACCESS_FINE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED
+
+            if(granted) {
+                appViewModel.openChooseStop.value = true
+                appViewModel.sheetSource.value = SheetSource.HOME
+                binding.sheetContent.recyclerView.isVisible = true
+                sheetBehavior.state = BottomSheetBehavior.STATE_HALF_EXPANDED
+                appViewModel.selectNearestStop()
+            } else {
+                permissionHandler.requestPermission()
+            }
         }
 
         binding.sheetContent.stopName.setOnFocusChangeListener { _, hasFocus ->
             if (ignoreFocusChanges) return@setOnFocusChangeListener
+            if(!hasFocus) return@setOnFocusChangeListener
 
-            if (hasFocus && sheetBehavior.state == BottomSheetBehavior.STATE_COLLAPSED) {
-                appViewModel.sheetSource.value = SheetSource.DEPARTURES
-                binding.sheetContent.recyclerView.isVisible = true
+            val granted = ActivityCompat.checkSelfPermission(
+                requireContext(), Manifest.permission.ACCESS_FINE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED
 
-                sheetBehavior.state = BottomSheetBehavior.STATE_HALF_EXPANDED
+            if(granted) {
+                if(sheetBehavior.state == BottomSheetBehavior.STATE_COLLAPSED) {
+                    appViewModel.sheetSource.value = SheetSource.DEPARTURES
+                    binding.sheetContent.recyclerView.isVisible = true
+                    sheetBehavior.state = BottomSheetBehavior.STATE_HALF_EXPANDED
+                }
+            } else {
+                binding.sheetContent.stopName.clearFocus()
+                permissionHandler.requestPermission()
             }
         }
 
@@ -671,6 +694,18 @@ class DeparturesFragment : Fragment() {
                 closeChooseStopSheet()
             } else {
                 hideRouteHeader()
+            }
+        }
+
+        appViewModel.userLocation.observe(viewLifecycleOwner) { loc ->
+            if (loc != null && isMapReady) {
+                if (appViewModel.selectedRoute.value == null) {
+                    googleMap.animateCamera(
+                        CameraUpdateFactory.newLatLngZoom(
+                            LatLng(loc.latitude, loc.longitude), 14.5f
+                        )
+                    )
+                }
             }
         }
     }

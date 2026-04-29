@@ -12,4 +12,5 @@
     <color name="end_color">#E74C3C</color>
     <color name="stop_color">#5493E6</color>
     <color name="nav_color">#3A67FC</color>
+    <color name="dim_white">#E6FFFFFF</color>
 </resources>
