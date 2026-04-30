@@ -11,6 +11,16 @@ android {
     namespace = "com.webscare.orangelinetrain"
     compileSdk = 36
 
+    bundle {
+        language {
+            enableSplit = false
+        }
+    }
+
+    androidResources {
+        localeFilters += listOf("en", "ur")
+    }
+
     signingConfigs {
         create("release") {
             storeFile = file("C:\\Users\\zubai\\Downloads\\TrainMap\\app\\upload-keystore-orangelinelahore.jks")
@@ -24,8 +34,8 @@ android {
         applicationId = "com.webscare.orangelinetrain"
         minSdk = 24
         targetSdk = 36
-        versionCode = 5
-        versionName = "1.0.5"
+        versionCode = 6
+        versionName = "1.0.6"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         setProperty("archivesBaseName", "Orange Line Lahore - V$versionCode($versionName)")

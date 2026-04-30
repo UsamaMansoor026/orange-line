@@ -1,4 +1,4 @@
-    package com.webscare.orangelinetrain
+package com.webscare.orangelinetrain
 
 import android.app.PictureInPictureParams
 import android.content.Context
@@ -12,7 +12,6 @@ import android.view.ViewTreeObserver
 import android.view.WindowInsets
 import android.view.WindowInsetsController
 import androidx.activity.addCallback
-import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
@@ -59,12 +58,26 @@ class MainActivity : AppCompatActivity() {
         )
 
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
+//        enableEdgeToEdge()
+
+        // This reset the status bar whenever the activity is recreated
+        window.decorView.setOnApplyWindowInsetsListener { view, insets ->
+            view.onApplyWindowInsets(insets)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                WindowInsets.Builder(insets)
+                    .setInsets(WindowInsets.Type.statusBars(), android.graphics.Insets.NONE)
+                    .setInsets(WindowInsets.Type.navigationBars(), android.graphics.Insets.NONE)
+                    .build()
+            } else {
+                insets
+            }
+        }
+
         _binding = ActivityMainBinding.inflate(layoutInflater)
         installSplashScreen().setKeepOnScreenCondition { false }
         setContentView(binding.root)
 
-        window.statusBarColor = getColor(android.R.color.transparent)
+        binding.root.setPadding(0, 0, 0, 0)
 
         setupSystemBars()
         setupNavController()
@@ -76,21 +89,6 @@ class MainActivity : AppCompatActivity() {
 
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
-//        if (intent.getBooleanExtra("EXIT_NAV", false)) {
-//
-//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && appViewModel.isInPipMode.value == true) {
-//                // If in PiP, kill everything as requested
-//                finishAndRemoveTask()
-//            } else {
-//                // If in Normal Mode, clear stack and go to Home
-//                val navHostFragment = supportFragmentManager
-//                    .findFragmentById(R.id.nav_host_main) as? NavHostFragment
-//                navHostFragment?.navController?.navigate(R.id.homeFragment, null, navOptions {
-//                    popUpTo(R.id.nav_graph) { inclusive = true }
-//                    launchSingleTop = true
-//                })
-//            }
-//        }
 
         setIntent(intent)
 
@@ -255,7 +253,7 @@ class MainActivity : AppCompatActivity() {
         isInPictureInPictureMode: Boolean, newConfig: Configuration
     ) {
         super.onPictureInPictureModeChanged(isInPictureInPictureMode, newConfig)
-        
+
         appViewModel.setPipMode(isInPictureInPictureMode)
 
         if (isInPictureInPictureMode) {
@@ -289,7 +287,7 @@ class MainActivity : AppCompatActivity() {
     private fun setupSystemBars() {
 
         val isDark =
-            (resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK) == android.content.res.Configuration.UI_MODE_NIGHT_YES
+            (resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             window.insetsController?.apply {
@@ -331,6 +329,8 @@ class MainActivity : AppCompatActivity() {
         val context = LocaleHelper.applyLanguage(newBase, langCode)
         super.attachBaseContext(context)
     }
+
+
 
     override fun onDestroy() {
         super.onDestroy()

@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name" translatable="false">Orange Line</string>
     <string name="google_maps_key">AIzaSyD4ZWQxs6BrtKjeD0YUMxKQxwZ9h4GGKGk</string>
@@ -101,8 +102,8 @@
     <string name="default_view">Default</string>
     <string name="satellite_view">Satellite</string>
     <string name="terrain">Terrain</string>
-    <string name="orange_line">ORANGE LINE</string>
-    <string name="lahore_metro_train">Lahore Metro Train</string>
+    <string name="orange_line" translatable="false">ORANGE LINE</string>
+    <string name="lahore_metro_train" translatable="false">Lahore Metro Train</string>
     <string name="destination_reached">Destination reached 🎉</string>
     <string name="you_have_arrived_your_destination">You have arrived your destination</string>
 

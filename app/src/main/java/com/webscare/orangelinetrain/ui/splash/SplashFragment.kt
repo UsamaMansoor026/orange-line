@@ -84,6 +84,7 @@ class SplashFragment : Fragment() {
             orientation = LinearLayout.HORIZONTAL
             gravity = Gravity.CENTER
             layoutParams = source.layoutParams
+            layoutDirection = View.LAYOUT_DIRECTION_LTR
         }
 
         val parent = source.parent as? ViewGroup ?: return
@@ -100,9 +101,10 @@ class SplashFragment : Fragment() {
                 typeface = source.typeface
                 includeFontPadding = source.includeFontPadding
                 if (spacingPx > 0) setPadding(0, 0, spacingPx, 0)
-                // Start invisible and 40px below final position
                 alpha = 0f
                 translationY = 40f
+                layoutDirection = View.LAYOUT_DIRECTION_LTR
+                textDirection = View.TEXT_DIRECTION_LTR
             }
             container.addView(charView)
 
